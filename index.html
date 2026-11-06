@@ -1107,7 +1107,7 @@
         우성고등학교 → 인천공항 → 우성고등학교<br>
         우성고등학교 → 김포공항 → 우성고등학교<br><br>
         개인차량 이용 시 공항까지의 유류비가 계산됩니다.<br>
-        톨비·주차비·공항버스·공항철도 등은 <strong>기타 실비</strong>에 첨부해주세요.
+        톨게이트비·주차비는 <strong>기타 실비</strong>에 첨부해주세요.
       </div>
     </div>
     <button class="main-button" onclick="document.getElementById('modalOverseasGuide').style.display='none'">확인하고 입력하기</button>
@@ -1271,8 +1271,24 @@
     currentFocusSearchInput: null,
     isDistanceCalculated: false,
     overseasGuideShown: false,
-    mealEligibleDays: 0
+    mealEligibleDays: 0,
+    lodgingCapExempt: false   // 교장: 숙박비 상한 미적용 (서버 PRINCIPAL_NAMES 기준)
   };
+
+  /* [교장 숙박비] 청구인 이름이 바뀌면 서버에 교장 여부를 조회해 둔다.
+     최종 금액은 제출 시 서버가 다시 계산하므로, 조회가 실패해도 화면 표시만 상한 기준으로 보일 뿐이다. */
+  let applicantPolicyRequest = null;
+  function refreshApplicantPolicy() {
+    const name = document.getElementById('applicantName').value.trim();
+    APP_DATA.lodgingCapExempt = false;
+    if (!name) { applicantPolicyRequest = null; return; }
+    const request = callServer('getApplicantPolicy', name)
+      .then(policy => {
+        if (request === applicantPolicyRequest) APP_DATA.lodgingCapExempt = !!(policy && policy.lodgingCapExempt);
+      })
+      .catch(() => {});
+    applicantPolicyRequest = request;
+  }
 
   const ICONS = {
     trash: `<svg class="icon-svg" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
@@ -1430,6 +1446,7 @@
     const numericAmount = parseInt(amount, 10) || 0;
     if (category === '식비') return Math.min(numericAmount, 8330);
     if (category === '숙박') {
+      if (APP_DATA.lodgingCapExempt) return numericAmount; // 교장: 상한 없이 실비
       let cap = 70000;
       const sub = subCategory || '';
       if (sub.includes('서울')) cap = 100000;
@@ -1581,6 +1598,8 @@
       APP_DATA.isDistanceCalculated = false;
       APP_DATA.overseasGuideShown = false;
       APP_DATA.mealEligibleDays = 0;
+      APP_DATA.lodgingCapExempt = false;
+      applicantPolicyRequest = null;
       updateSummaryBadges();
 
       // 기본 입력 초기화
@@ -1877,7 +1896,53 @@
     });
   }
 
+  /* [개인차량] 개인차량 출장은 유류비로 교통비를 받으므로 기타 실비에서 '대중교통' 항목을 고를 수 없다 */
+  function isPublicFareBlocked() {
+    return isPrivateTransport();
+  }
+
+  function syncOtherTypeOptions() {
+    const sel = document.getElementById('otherType');
+    if (!sel) return;
+    const publicOption = sel.querySelector('option[value="public"]');
+    const blocked = isPublicFareBlocked();
+    if (publicOption) {
+      publicOption.disabled = blocked;
+      publicOption.hidden = blocked;
+    }
+    if (blocked && sel.value === 'public') {
+      sel.selectedIndex = 0;
+      sel.classList.remove('has-value');
+    }
+  }
+
+  // 조건에 맞는 영수증(저장분·임시분)을 한꺼번에 제외
+  function removeEntriesWhere(category, predicate, message) {
+    const draftKey = CATEGORY_DRAFT_KEY[category];
+    let removed = 0;
+    Object.entries(APP_DATA.files).forEach(([id, file]) => {
+      if (file.category !== category || !predicate(file)) return;
+      revokePreviewUrl(file);
+      delete APP_DATA.files[id];
+      removed++;
+    });
+    const drafts = APP_DATA.drafts[draftKey] || [];
+    const kept = drafts.filter(item => {
+      if (!predicate(item)) return true;
+      revokePreviewUrl(item);
+      removed++;
+      return false;
+    });
+    APP_DATA.drafts[draftKey] = kept;
+    if (removed > 0) {
+      renderReceiptList(draftKey);
+      updateTotal();
+      if (message) toast(message);
+    }
+  }
+
   window.openModal = function(type) {
+    if (type === 'other') syncOtherTypeOptions();
     const draftKey = getDraftKeyByType(type);
     if (draftKey) renderReceiptList(draftKey);
     document.getElementById('modal' + type.charAt(0).toUpperCase() + type.slice(1)).style.display = 'flex';
@@ -1965,7 +2030,7 @@
     const overseasTripCheck = document.getElementById('overseasTripCheck');
     const travelType = document.getElementById('travelType');
     let text = '';
-    if(value === 'private') text = "교통비(유류비)가 거리 기반으로 계산됩니다.";
+    if(value === 'private') text = "교통비(유류비)가 거리 기반으로 계산됩니다. 톨게이트비·주차비는 '기타 실비'에서 청구해주세요.";
     else if(value === 'public_transport') text = "관내 여부 확인을 위해 거리를 계산합니다. 요금은 '기타 실비'에서 청구해주세요.";
     else if(value === 'company_car') text = "관내 여부 확인을 위해 거리를 계산합니다. 일비의 50%가 감액됩니다.";
     else if(value === 'companion') text = "관내 여부 확인을 위해 거리를 계산합니다. 일비의 50%가 감액되며 교통비·기타 교통비(통행료·주차료 등)는 지급되지 않습니다.";
@@ -2266,6 +2331,13 @@
 
       if (!APP_DATA.isDistanceCalculated) calculateDistance();
       else {
+          // 교장 여부 조회가 아직 진행 중이면 끝날 때까지 기다린다 (보통 이미 끝나 있음)
+          if (!applicantPolicyRequest) refreshApplicantPolicy();
+          if (applicantPolicyRequest) {
+            showLoading(true, '확인 중');
+            await applicantPolicyRequest;
+            showLoading(false);
+          }
           goToStep2();
           updateInputGuide();
       }
@@ -2370,6 +2442,9 @@
     if (getCategoryCount('기타') > getReceiptLimit('기타')) {
       return getReceiptLimitMessage('기타', 0);
     }
+    if (isPublicFareBlocked() && Object.values(APP_DATA.files).some(f => f.category === '기타' && f.subCategory === '대중교통')) {
+      return '개인차량 출장은 기타 실비에 대중교통 요금을 청구할 수 없습니다.';
+    }
     const zeroReceipt = Object.values(APP_DATA.files).find(f => !isValidReceiptAmount(f.amount));
     if (zeroReceipt) {
       return `금액이 입력되지 않은 영수증이 있습니다 (${zeroReceipt.category} · ${zeroReceipt.name}).`;
@@ -2386,6 +2461,7 @@
       document.getElementById('modalConfirm').style.display = 'flex';
     });
     document.querySelectorAll('input, select').forEach(el => { el.addEventListener('change', function() { if(this.value) this.classList.add('has-value'); else this.classList.remove('has-value'); updateInputGuide(); }); el.addEventListener('focus', function() { this.classList.remove('breathing-input'); }); });
+    document.getElementById('applicantName').addEventListener('change', refreshApplicantPolicy);
     document.getElementById('lodgingType').addEventListener('change', () => updateInputGuide()); document.getElementById('otherType').addEventListener('change', () => updateInputGuide());
     setupFileHandler('lodgingFile', 'lodgingFileList', '숙박', 'lodging'); setupFileHandler('mealFile', 'mealFileList', '식비', 'meal'); setupFileHandler('otherFile', 'otherFileList', '기타', 'other');
     document.getElementById('doSearchBtn').addEventListener('click', handleSearch);
@@ -2466,7 +2542,9 @@
     const lodgingMsg = document.getElementById('lodgingEligibleMsg');
     const lodgingBtn = document.getElementById('btnAddLodging');
     if (APP_DATA.nights > 0) {
-      lodgingMsg.innerHTML = `숙박비 정산 가능 · 최대 ${APP_DATA.nights}박`;
+      lodgingMsg.innerHTML = APP_DATA.lodgingCapExempt
+        ? `숙박비 정산 가능 · 최대 ${APP_DATA.nights}박<br><span style="font-size:0.82rem;">교장 선생님은 상한 없이 실비로 정산됩니다.</span>`
+        : `숙박비 정산 가능 · 최대 ${APP_DATA.nights}박`;
       lodgingMsg.style.color = '#00B894';
       lodgingBtn.style.display = 'flex';
     } else {
@@ -2497,6 +2575,13 @@
     const otherLimit = getReceiptLimit('기타');
     trimCategoryEntries('기타', otherLimit);
     document.getElementById('btnAddOther').style.display = otherLimit === 0 ? 'none' : 'flex';
+
+    /* [개인차량] 대중교통 영수증 제외 + 항목 선택지에서 숨김 */
+    if (isPublicFareBlocked()) {
+      removeEntriesWhere('기타', item => item.subCategory === '대중교통',
+        '개인차량 출장은 대중교통 요금을 청구할 수 없어 대중교통 영수증을 제외했습니다.');
+    }
+    syncOtherTypeOptions();
 
     updateSummaryBadges();
     updateTotal();
@@ -2533,6 +2618,7 @@
 
     if (lodgingCount > 0) {
         const lodgingCap = file => {
+            if (APP_DATA.lodgingCapExempt) return Infinity;
             const sub = file.subCategory || '';
             if (sub.includes('서울')) return 100000;
             if (sub.includes('광역시')) return 80000;
