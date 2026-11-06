@@ -805,6 +805,76 @@
       .subsection-title { font-size: 0.82rem; }
       .subsection-note { font-size: 0.72rem; }
     }
+
+    /* ───────── [디자인] 심플 정리 (위 기본 스타일을 덮어씀) ───────── */
+    body { padding-bottom: 0; }
+
+    /* 단계 표시: 글자 탭 */
+    .step-indicator { align-items: center; gap: 8px; margin-bottom: 12px; }
+    .step-dot {
+      width: auto; height: auto; background: none; box-shadow: none;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; font-weight: 700; color: var(--text-label);
+      transition: color 0.2s;
+    }
+    .step-dot .step-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #dbe5f1; color: #fff; font-size: 0.72rem; font-weight: 800;
+    }
+    .step-dot.active { width: auto; background: none; box-shadow: none; color: var(--primary-strong); }
+    .step-dot.active .step-num { background: var(--primary); }
+    .step-sep { width: 24px; height: 2px; border-radius: 2px; background: #dbe5f1; }
+
+    /* 카드 간격: step-shell의 gap 하나로만 */
+    .step-shell { gap: 10px; }
+    .step-shell .section-card,
+    .step-shell .dashboard-card { margin-bottom: 0; }
+    .section-card { border-radius: 20px; }
+
+    /* 제목: 모두 왼쪽 정렬, 아이콘 색 통일 */
+    #routeSectionTitle { justify-content: flex-start; }
+    h3.section-title { margin-bottom: 10px; }
+    .title-with-icon { display: inline-flex; align-items: center; gap: 8px; }
+    .title-icon { width: 18px; height: 18px; color: var(--primary); }
+
+    .form-group { margin-bottom: 4px; }
+    .date-row-label { margin: 10px 0 6px 2px; color: var(--text-label); font-size: 0.76rem; }
+
+    /* 이동수단 칩: 선 아이콘 */
+    .chip-icon { width: 18px; height: 18px; color: var(--text-label); flex-shrink: 0; }
+    .grid-btn.active .chip-icon { color: var(--primary); }
+
+    /* 2단계 그룹 제목 */
+    .group-title {
+      font-size: 0.82rem; font-weight: 800; color: var(--text-label);
+      margin: 6px 2px -2px 2px; letter-spacing: -0.02em;
+    }
+    .total-sticky-bar { margin-bottom: 0; }
+    .total-title { font-size: 0.86rem; opacity: 0.92; }
+
+    /* 카드 아이콘 색 통일 */
+    .card-icon-box { background: var(--primary-soft); color: var(--primary); }
+
+    /* 실비 추가 칩 한 줄 */
+    .add-chip-row { display: flex; gap: 8px; }
+    .add-chip {
+      flex: 1; height: 46px; padding: 0 6px;
+      border: 1.5px dashed #bdd0ea; border-radius: 14px; background: #fff;
+      color: var(--primary-strong); font-size: 0.86rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; white-space: nowrap; transition: background 0.2s;
+    }
+    .add-chip:active { background: var(--primary-soft); }
+
+    /* 하단 고정 버튼 */
+    .bottom-bar {
+      position: sticky; bottom: 0; z-index: 50;
+      display: flex; gap: 10px;
+      margin: 0 -16px; padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+      background: linear-gradient(to top, #eef3f8 72%, rgba(238, 243, 248, 0));
+    }
+    .bottom-bar .main-button { margin-top: 0; height: 50px; }
   </style>
 </head>
 <body>
@@ -817,62 +887,52 @@
     </h2>
   </div>
 
+  <!-- [디자인] 단계 표시: 점 대신 글자로 -->
   <div class="step-indicator">
-    <div class="step-dot active" id="dot1"></div>
-    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot active" id="dot1"><span class="step-num">1</span>출장 정보</div>
+    <div class="step-sep"></div>
+    <div class="step-dot" id="dot2"><span class="step-num">2</span>정산</div>
   </div>
 
   <!-- STEP 1 -->
   <div id="step1Container" class="step-shell">
-    <div class="section-card" style="animation-delay: 0.1s;">
+    <div class="section-card">
       <h3 class="section-title">
-        <svg class="icon-svg" viewBox="0 0 24 24" style="color:#4169E1; margin-right:6px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        <svg class="icon-svg title-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
         출장 일정
       </h3>
 
-      <div class="form-group" style="margin-bottom: 16px;">
+      <div class="form-group">
         <input type="text" id="applicantName" placeholder=" " required enterkeyhint="next">
         <label>청구인 성명</label>
       </div>
 
-      <div style="margin-top:10px;">
-        <div class="schedule-title">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px; height:16px; color:var(--primary);"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          출장 시작 / 종료
-        </div>
-        <div class="date-row-label">
-          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 12h20"></path><path d="M19 9l3 3-3 3"></path><path d="M2 12a9 9 0 0 1 12.39-8.45"></path></svg>
-          시작
-        </div>
-        <div class="grid-date-row">
-            <input type="text" id="startDate" class="minimal-input t-date" placeholder="날짜 선택" readonly>
-            <select id="startHour" class="minimal-input t-time"></select>
-            <select id="startMin" class="minimal-input t-time"></select>
-        </div>
+      <div class="date-row-label">시작</div>
+      <div class="grid-date-row">
+          <input type="text" id="startDate" class="minimal-input t-date" placeholder="날짜 선택" readonly>
+          <select id="startHour" class="minimal-input t-time"></select>
+          <select id="startMin" class="minimal-input t-time"></select>
+      </div>
 
-        <div class="date-row-label">
-          <svg class="icon-svg" viewBox="0 0 24 24" style="transform: rotate(180deg);"><path d="M2 12h20"></path><path d="M19 9l3 3-3 3"></path><path d="M2 12a9 9 0 0 1 12.39-8.45"></path></svg>
-          종료
-        </div>
-        <div class="grid-date-row">
-            <input type="text" id="endDate" class="minimal-input t-date" placeholder="날짜 선택" readonly>
-            <select id="endHour" class="minimal-input t-time"></select>
-            <select id="endMin" class="minimal-input t-time"></select>
-        </div>
+      <div class="date-row-label">종료</div>
+      <div class="grid-date-row">
+          <input type="text" id="endDate" class="minimal-input t-date" placeholder="날짜 선택" readonly>
+          <select id="endHour" class="minimal-input t-time"></select>
+          <select id="endMin" class="minimal-input t-time"></select>
       </div>
     </div>
 
-    <div class="section-card" id="routeSectionCard" style="animation-delay: 0.2s;">
+    <div class="section-card" id="routeSectionCard">
       <h3 class="section-title" id="routeSectionTitle">
-        <span id="routeTitleText" style="display:flex; align-items:center;">
-            <svg class="icon-svg" viewBox="0 0 24 24" style="color:#10B981; margin-right:6px;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+        <span id="routeTitleText" class="title-with-icon">
+            <svg class="icon-svg title-icon" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
             출장 경로
         </span>
       </h3>
       <input type="hidden" id="travelType" value="domestic">
 
       <!-- 타임라인 컨테이너 -->
-      <div id="timelineContainer" style="margin-bottom: 10px;"></div>
+      <div id="timelineContainer"></div>
 
       <!-- 결과 박스 -->
       <div id="routeDistanceBox" class="distance-result-box hidden">
@@ -880,11 +940,11 @@
       </div>
     </div>
 
-    <div class="section-card" id="transportSectionCard" style="animation-delay: 0.3s;">
+    <div class="section-card" id="transportSectionCard">
       <h3 class="section-title">
         <span class="transport-title-row">
           <span class="transport-title-left">
-            <svg class="icon-svg" viewBox="0 0 24 24" style="color:#4169E1; margin-right:6px;"><path d="M9 18l6-6-6-6"></path><path d="M15 12H3"></path><path d="M21 5v14"></path></svg>
+            <svg class="icon-svg title-icon" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
             이동수단
           </span>
           <span class="transport-extra-row hidden" id="transportExtraRow">
@@ -896,21 +956,22 @@
           </span>
         </span>
       </h3>
+      <!-- [디자인] 이모지 → 선 아이콘으로 통일 -->
       <div class="transport-chip-group">
         <div class="grid-btn transport-chip" data-value="private" onclick="selectTransport('private', this)">
-            <span class="emoji-icon">🚘</span>
+            <svg class="icon-svg chip-icon" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
             개인차량
         </div>
         <div class="grid-btn transport-chip" data-value="public_transport" onclick="selectTransport('public_transport', this)">
-            <span class="emoji-icon">🚆</span>
+            <svg class="icon-svg chip-icon" viewBox="0 0 24 24"><path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"></path><path d="m9 15-1-1"></path><path d="m15 15 1-1"></path><path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"></path><path d="m8 19-2 3"></path><path d="m16 19 2 3"></path></svg>
             대중교통
         </div>
         <div class="grid-btn transport-chip" data-value="company_car" onclick="selectTransport('company_car', this)">
-             <span class="emoji-icon">🚌</span>
+            <svg class="icon-svg chip-icon" viewBox="0 0 24 24"><path d="M8 6v6"></path><path d="M15 6v6"></path><path d="M2 12h19.6"></path><path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3"></path><circle cx="7" cy="18" r="2"></circle><path d="M9 18h5"></path><circle cx="16" cy="18" r="2"></circle></svg>
             공용차량
         </div>
         <div class="grid-btn transport-chip" data-value="companion" onclick="selectTransport('companion', this)">
-             <span class="emoji-icon">👥</span>
+            <svg class="icon-svg chip-icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             차량동승
         </div>
       </div>
@@ -918,45 +979,31 @@
       <div id="transportationInfo" class="info-text">출장 경로를 입력한 뒤 이동수단을 선택해주세요.</div>
     </div>
 
-    <button class="main-button" id="mainStepBtn" onclick="handleMainBtnClick()">
-      이동수단 선택 후 계속하기
-    </button>
+    <!-- [디자인] 하단 고정 버튼 -->
+    <div class="bottom-bar">
+      <button class="main-button" id="mainStepBtn" onclick="handleMainBtnClick()">
+        이동수단 선택 후 계속하기
+      </button>
+    </div>
   </div>
 
   <!-- STEP 2 -->
   <div id="step2Container" class="hidden step-shell">
+    <!-- [디자인] 요약 배지 3개 대신 합계 카드 안에 한 줄 요약 -->
     <div class="total-sticky-bar">
       <div>
         <div class="total-label">예상 지급 금액</div>
-        <div class="total-title">이번 출장 정산 요약</div>
+        <div class="total-title" id="summaryLine">-</div>
       </div>
       <div class="total-amount" id="grandTotal">0원</div>
     </div>
 
-    <div class="summary-badges">
-      <div class="summary-badge">
-        <div class="summary-badge-label">출장 기간</div>
-        <div class="summary-badge-value" id="summaryTripDays">0일</div>
-      </div>
-      <div class="summary-badge">
-        <div class="summary-badge-label">운행 거리</div>
-        <div class="summary-badge-value" id="summaryTotalKm">0km</div>
-      </div>
-      <div class="summary-badge">
-        <div class="summary-badge-label">이동 수단</div>
-        <div class="summary-badge-value" id="summaryTransport">미선택</div>
-      </div>
-    </div>
-
-    <div class="subsection-label">
-      <div class="subsection-title">자동 계산 항목</div>
-      <div class="subsection-note">입력값 기준 즉시 반영</div>
-    </div>
+    <div class="group-title">자동 계산</div>
 
     <div class="dashboard-card readonly">
       <div class="card-left">
-        <div class="card-icon-box" style="background:#EFF6FF; color:#4169E1;">
-          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 20a6 6 0 0 1-12 0V9a9 9 0 0 1 18 0v11"></path><path d="M16 19h4a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H4.5"></path><path d="M15 3h6"></path><path d="M15 6h6"></path></svg>
+        <div class="card-icon-box">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
         </div>
         <div class="card-info">
           <h4>교통비</h4>
@@ -970,7 +1017,7 @@
 
     <div class="dashboard-card readonly">
       <div class="card-left">
-        <div class="card-icon-box" style="background:#FFFBEB; color:#F59E0B;">
+        <div class="card-icon-box">
           <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><line x1="12" y1="18" x2="12" y2="22"></line><line x1="12" y1="2" x2="12" y2="6"></line></svg>
         </div>
         <div class="card-info">
@@ -983,18 +1030,11 @@
       </div>
     </div>
 
-    <div class="subsection-label">
-      <div class="subsection-title">실비 첨부 항목</div>
-      <div class="subsection-note">영수증 첨부 후 금액 입력</div>
-    </div>
+    <div class="group-title">실비 (영수증 첨부)</div>
 
-    <div id="btnAddLodging" class="action-card-btn" onclick="openModal('lodging')">
-      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      숙박비 추가
-    </div>
     <div id="cardLodging" class="dashboard-card hidden" onclick="openModal('lodging')">
       <div class="card-left">
-        <div class="card-icon-box" style="background:#F3F0FF; color:#8B5CF6;">
+        <div class="card-icon-box">
           <svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 4v16"></path><path d="M2 8h18a2 2 0 0 1 2 2v10"></path><path d="M2 17h5a3 3 0 0 0 3-3v-2.5a2 2 0 0 1 2-2 2 2 0 0 1 2 2V14a3 3 0 0 0 3 3h5"></path></svg>
         </div>
         <div class="card-info">
@@ -1008,13 +1048,9 @@
       </div>
     </div>
 
-    <div id="btnAddMeal" class="action-card-btn" onclick="openModal('meal')">
-      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      식비 추가
-    </div>
     <div id="cardMeal" class="dashboard-card hidden" onclick="openModal('meal')">
       <div class="card-left">
-        <div class="card-icon-box" style="background:#FFF1F2; color:#F43F5E;">
+        <div class="card-icon-box">
           <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
         </div>
         <div class="card-info">
@@ -1028,13 +1064,9 @@
       </div>
     </div>
 
-    <div id="btnAddOther" class="action-card-btn" onclick="openModal('other')">
-      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      기타 실비 추가
-    </div>
     <div id="cardOther" class="dashboard-card hidden" onclick="openModal('other')">
       <div class="card-left">
-        <div class="card-icon-box" style="background:#F1F5F9; color:#64748B;">
+        <div class="card-icon-box">
           <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         </div>
         <div class="card-info">
@@ -1048,7 +1080,14 @@
       </div>
     </div>
 
-    <div style="display:flex; gap:10px; margin-top:14px;">
+    <!-- [디자인] 큰 점선 버튼 3개 → 추가 칩 한 줄 -->
+    <div class="add-chip-row">
+      <button type="button" id="btnAddLodging" class="add-chip" onclick="openModal('lodging')">+ 숙박비</button>
+      <button type="button" id="btnAddMeal" class="add-chip" onclick="openModal('meal')">+ 식비</button>
+      <button type="button" id="btnAddOther" class="add-chip" onclick="openModal('other')">+ 기타 실비</button>
+    </div>
+
+    <div class="bottom-bar">
       <button class="main-button secondary" id="backToStep1Btn" style="flex:1;">이전</button>
       <button class="main-button" id="finalSubmitBtn" style="flex:2;">정산 신청 완료</button>
     </div>
@@ -1297,26 +1336,22 @@
       document.getElementById('modalSuccess').style.display = 'flex';
   }
 
+  /* [디자인] 요약 배지 3개 대신 합계 카드에 "2일 · 개인차량 · 86.4km" 한 줄로 표시 */
   function updateSummaryBadges() {
-    const tripDaysEl = document.getElementById('summaryTripDays');
-    const totalKmEl = document.getElementById('summaryTotalKm');
-    const transportEl = document.getElementById('summaryTransport');
+    const summaryEl = document.getElementById('summaryLine');
+    if (!summaryEl) return;
     const transportMap = {
       private: '개인차량',
       public_transport: '대중교통',
       company_car: '공용차량',
       companion: '차량동승'
     };
-
-    if (tripDaysEl) {
-      tripDaysEl.innerText = APP_DATA.tripDays > 0 ? `${APP_DATA.tripDays}일` : '0일';
-    }
-    if (totalKmEl) {
-      totalKmEl.innerText = APP_DATA.totalKm > 0 ? `${APP_DATA.totalKm}km` : '0km';
-    }
-    if (transportEl) {
-      transportEl.innerText = transportMap[getSelectedTransportType()] || '미선택';
-    }
+    const parts = [];
+    if (APP_DATA.tripDays > 0) parts.push(APP_DATA.nights > 0 ? `${APP_DATA.nights}박 ${APP_DATA.tripDays}일` : '당일');
+    const transport = transportMap[getSelectedTransportType()];
+    if (transport) parts.push(transport);
+    if (APP_DATA.totalKm > 0) parts.push(`${APP_DATA.totalKm}km`);
+    summaryEl.innerText = parts.length ? parts.join(' · ') : '-';
   }
 
   function revokePreviewUrl(entry) {
@@ -1426,6 +1461,8 @@
   function getReceiptLimit(category) {
     if (category === '식비') return APP_DATA.mealEligibleDays;
     if (category === '숙박') return APP_DATA.nights;
+    /* [규정 기준표] 차량 동승자는 교통비 및 기타 교통비(통행료·주차료 등)를 지급하지 않음 */
+    if (category === '기타') return getSelectedTransportType() === 'companion' ? 0 : Infinity;
     return Infinity;
   }
 
@@ -1439,6 +1476,9 @@
       return limit === 0
         ? '현재 출장 시간 조건으로는 식비를 청구할 수 없습니다.'
         : `식비 영수증은 조건 충족일 기준 최대 ${limit}개까지 첨부 가능합니다.`;
+    }
+    if (category === '기타' && limit === 0) {
+      return '차량동승자는 교통비 및 기타 교통비(통행료·주차료 등)를 청구할 수 없습니다.';
     }
     return '';
   }
@@ -1880,15 +1920,15 @@
 
     if (routeTitle) {
       routeTitle.innerHTML = isOverseas
-        ? `<svg class="icon-svg" viewBox="0 0 24 24" style="color:#10B981; margin-right:6px;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>공항 이동 경로`
-        : `<svg class="icon-svg" viewBox="0 0 24 24" style="color:#10B981; margin-right:6px;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>출장 경로`;
+        ? `<svg class="icon-svg title-icon" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>공항 이동 경로`
+        : `<svg class="icon-svg title-icon" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>출장 경로`;
     }
 
     document.querySelectorAll('.dynamic-row .route-label').forEach(label => {
       label.innerText = isOverseas ? '공항' : '방문';
     });
     document.querySelectorAll('.dynamic-row .dest').forEach(input => {
-      input.placeholder = isOverseas ? '🔍 인천공항 또는 김포공항 검색' : '🔍 터치하여 장소 검색';
+      input.placeholder = isOverseas ? '인천공항 또는 김포공항 검색' : '터치하여 장소 검색';
     });
 
     /* [수정 ②] 이동수단과 무관하게 거리 계산 단계를 거친다 */
@@ -1896,10 +1936,10 @@
       mainBtn.innerHTML = '이동수단 선택 후 계속하기';
       mainBtn.classList.remove('ready-to-go');
     } else if (mainBtn && !APP_DATA.isDistanceCalculated) {
-      mainBtn.innerHTML = isOverseas ? '🚗 공항 이동거리 계산하기' : '🚗 운행 거리 계산하기';
+      mainBtn.innerHTML = isOverseas ? '공항 이동거리 계산하기' : '운행 거리 계산하기';
       mainBtn.classList.remove('ready-to-go');
     } else if (mainBtn && APP_DATA.isDistanceCalculated) {
-      mainBtn.innerHTML = isOverseas ? '✅ 일비·실비 정산하러 가기' : '✅ 정산하러 가기';
+      mainBtn.innerHTML = isOverseas ? '일비·실비 정산하러 가기' : '정산하러 가기';
       mainBtn.classList.add('ready-to-go');
     }
 
@@ -1928,7 +1968,7 @@
     if(value === 'private') text = "교통비(유류비)가 거리 기반으로 계산됩니다.";
     else if(value === 'public_transport') text = "관내 여부 확인을 위해 거리를 계산합니다. 요금은 '기타 실비'에서 청구해주세요.";
     else if(value === 'company_car') text = "관내 여부 확인을 위해 거리를 계산합니다. 일비의 50%가 감액됩니다.";
-    else if(value === 'companion') text = "관내 여부 확인을 위해 거리를 계산합니다. 일비의 50%가 감액되며 교통비는 지급되지 않습니다.";
+    else if(value === 'companion') text = "관내 여부 확인을 위해 거리를 계산합니다. 일비의 50%가 감액되며 교통비·기타 교통비(통행료·주차료 등)는 지급되지 않습니다.";
     infoBox.innerText = text;
     if (value !== 'private') {
       if (overseasTripCheck) overseasTripCheck.checked = false;
@@ -2117,7 +2157,7 @@
       <div class="timeline-col"><div class="timeline-marker visit"></div><div class="timeline-line"></div></div>
       <div class="content-col">
           <span class="route-label">${getTravelType() === 'overseas' ? '공항' : '방문'}</span>
-          <input type="text" class="dest" placeholder="${getTravelType() === 'overseas' ? '🔍 인천공항 또는 김포공항 검색' : '🔍 터치하여 장소 검색'}" value="${value}" readonly>
+          <input type="text" class="dest" placeholder="${getTravelType() === 'overseas' ? '인천공항 또는 김포공항 검색' : '터치하여 장소 검색'}" value="${value}" readonly>
           <!-- Hidden Coordinates / Address -->
           <input type="hidden" class="dest-x">
           <input type="hidden" class="dest-y">
@@ -2214,7 +2254,7 @@
         btn.classList.remove('ready-to-go');
         return;
       }
-      btn.innerHTML = getTravelType() === 'overseas' ? '🚗 공항 이동거리 계산하기' : '🚗 운행 거리 계산하기';
+      btn.innerHTML = getTravelType() === 'overseas' ? '공항 이동거리 계산하기' : '운행 거리 계산하기';
       btn.classList.remove('ready-to-go');
   }
 
@@ -2264,8 +2304,8 @@
         const btn = document.getElementById('mainStepBtn');
 
         distBox.classList.remove('hidden');
-        distMsg.innerHTML = `🏁 총 운행 거리: ${APP_DATA.totalKm}km`;
-        btn.innerHTML = getTravelType() === 'overseas' ? `✅ 일비·실비 정산하러 가기` : `✅ 정산하러 가기`;
+        distMsg.innerHTML = `총 운행 거리 ${APP_DATA.totalKm}km`;
+        btn.innerHTML = getTravelType() === 'overseas' ? `일비·실비 정산하러 가기` : `정산하러 가기`;
         btn.classList.add('ready-to-go');
         APP_DATA.isDistanceCalculated = true;
         updateSummaryBadges();
@@ -2326,6 +2366,9 @@
     }
     if (getCategoryCount('숙박') > APP_DATA.nights) {
       return getReceiptLimitMessage('숙박', APP_DATA.nights);
+    }
+    if (getCategoryCount('기타') > getReceiptLimit('기타')) {
+      return getReceiptLimitMessage('기타', 0);
     }
     const zeroReceipt = Object.values(APP_DATA.files).find(f => !isValidReceiptAmount(f.amount));
     if (zeroReceipt) {
@@ -2449,6 +2492,11 @@
       mealMsg.style.color = '#EF4444';
       mealBtn.style.display = 'none';
     }
+
+    /* [규정 기준표] 차량동승은 기타 교통비 미지급 → 기존 영수증 제외 + 추가 버튼 숨김 */
+    const otherLimit = getReceiptLimit('기타');
+    trimCategoryEntries('기타', otherLimit);
+    document.getElementById('btnAddOther').style.display = otherLimit === 0 ? 'none' : 'flex';
 
     updateSummaryBadges();
     updateTotal();
