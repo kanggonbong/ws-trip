@@ -1,19 +1,2680 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>우성고 출장여비</title>
 
-<!-- 카톡 미리보기 -->
-<meta property="og:title" content="우성고 관외출장 시스템">
-<meta property="og:description" content="출장비를 간편하게 입력하고 정산하세요">
-<meta property="og:image" content="https://via.placeholder.com/300">
+  <!-- Fonts & Libraries -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/air-datepicker@3.5.0/air-datepicker.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
-<!-- 자동 이동 (여기 중요) -->
-<meta http-equiv="refresh" content="0;url=https://script.google.com/macros/s/AKfycbzCNNyIU5-Dlx99p8mubKbRSAkwzl_6uG55Lt5hZVpcf2c6fVDAtddCr9txdk5Fl-ij/exec">
+  <style>
+    :root {
+      --primary: #1f4b99;
+      --primary-strong: #173d7a;
+      --primary-soft: #e9f1ff;
+      --primary-gradient: linear-gradient(135deg, #1f4b99 0%, #2f6fd6 100%);
+      --bg-gradient: linear-gradient(180deg, #f6f8fc 0%, #eef3f8 100%);
+      --surface-plain: #ffffff;
+      --surface-muted: #f8fafc;
+      --border-soft: #dbe5f1;
 
-<title>우성고 출장비</title>
+      --accent-warning: #F59E0B;
+      --accent-success: #0f9f6e;
+      --accent-danger: #dc2626;
+
+      --text-title: #14213d;
+      --text-body: #4b5b76;
+      --text-label: #7b8aa3;
+
+      --glass-bg: rgba(255, 255, 255, 0.96);
+      --glass-border: 1px solid rgba(207, 219, 235, 0.9);
+      --glass-shadow: 0 10px 32px rgba(20, 33, 61, 0.07);
+
+      --input-height: 54px;
+      --radius-lg: 28px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', sans-serif; }
+
+    body {
+      margin: 0; padding: 16px 16px 120px 16px;
+      background:
+        radial-gradient(circle at top left, rgba(47, 111, 214, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(15, 159, 110, 0.08), transparent 24%),
+        var(--bg-gradient);
+      min-height: 100vh;
+      color: var(--text-body);
+    }
+
+    .container { max-width: 580px; margin: 0 auto; }
+
+    /* --- SVG Icons Utility --- */
+    .icon-svg {
+      width: 20px; height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: middle;
+    }
+
+    /* --- Header Area --- */
+    .header {
+      text-align: center;
+      margin-bottom: 12px;
+      padding-top: 8px;
+      animation: slideDown 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .header h2 {
+      font-size: 1.45rem;
+      margin: 0;
+      color: var(--text-title);
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+      gap: 10px;
+    }
+    .step-dot {
+      width: 10px; height: 10px; border-radius: 999px; background: #c4d2e4;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .step-dot.active { background: var(--primary); width: 36px; box-shadow: 0 6px 14px rgba(31, 75, 153, 0.28); }
+
+    .section-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--glass-shadow);
+      margin-bottom: 10px;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      opacity: 1;
+    }
+    .section-card:hover {
+      border-color: rgba(176, 194, 219, 0.95);
+      box-shadow: 0 16px 36px rgba(20, 33, 61, 0.08);
+    }
+
+    h3.section-title {
+      margin: 0 0 4px 0;
+      font-size: 1rem;
+      padding-bottom: 0;
+      color: var(--text-title);
+      display: flex; align-items: center; justify-content: flex-start;
+      gap: 8px; font-weight: 800; min-height: 30px;
+    }
+    .step-shell {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .subsection-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 2px 8px 2px;
+    }
+    .subsection-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text-title);
+      letter-spacing: -0.02em;
+    }
+    .subsection-note {
+      font-size: 0.78rem;
+      color: var(--text-label);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* --- Inputs --- */
+    .form-group { position: relative; margin-bottom: 12px; }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%; padding: 0 14px; height: 48px;
+      border: 2px solid #E2E8F0; background: #FFFFFF;
+      border-radius: var(--radius-md);
+      font-size: 0.96rem; text-align: center; color: var(--text-title); font-weight: 600;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      appearance: none;
+    }
+
+    input:focus, select:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(65, 105, 225, 0.15);
+    }
+
+    .form-group label {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      color: var(--text-label); pointer-events: none; transition: 0.2s; font-size: 0.95rem; font-weight: 500; white-space: nowrap;
+    }
+
+    .form-group input:focus + label, .form-group input:not(:placeholder-shown) + label,
+    .form-group select:focus + label, .form-group select.has-value + label {
+      top: -8px; left: 14px; transform: translateY(0) scale(0.85);
+      background: #fff; padding: 2px 6px; color: var(--primary);
+      font-weight: 700; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* --- Compact Grid Layouts --- */
+    .date-row-label {
+      font-size: 0.76rem;
+      font-weight: 800; color: var(--primary-strong);
+      margin-bottom: 6px; margin-top: 8px;
+      display: flex; align-items: center; gap: 6px;
+      letter-spacing: -0.02em;
+    }
+    .schedule-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 4px 0 8px 0;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--text-title);
+    }
+    .grid-date-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* Transport Buttons */
+    .grid-3-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .grid-2-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .transport-chip-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .travel-mode-note {
+      background: #eef5ff;
+      border: 1px solid #c6daf9;
+      color: var(--primary-strong);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      line-height: 1.45;
+      text-align: center;
+      margin: 4px 0 14px 0;
+    }
+
+
+    #routeSectionTitle {
+      justify-content: center;
+    }
+    .transport-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+    }
+    .transport-title-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .overseas-check-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--text-title);
+      user-select: none;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 999px;
+      padding: 6px 9px;
+      white-space: nowrap;
+    }
+
+    .transport-extra-row {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 0;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .transport-extra-row.hidden {
+      display: inline-flex !important;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .overseas-check-inline input {
+      position: absolute;
+      opacity: 0;
+      width: 1px;
+      height: 1px;
+      pointer-events: none;
+    }
+
+    .custom-check {
+      width: 20px;
+      height: 20px;
+      border-radius: 7px;
+      border: 2px solid #CBD5E1;
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .overseas-check-inline input:checked + .custom-check {
+      background: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 4px 10px rgba(65, 105, 225, 0.22);
+    }
+
+    .overseas-check-inline input:checked + .custom-check::after {
+      content: '✓';
+      color: #fff;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    @media (max-width: 390px) {
+      .overseas-check-inline {
+        font-size: 0.76rem;
+        padding: 5px 7px;
+        gap: 5px;
+      }
+      .custom-check {
+        width: 18px;
+        height: 18px;
+        border-radius: 6px;
+      }
+    }
+
+    .grid-btn {
+      padding: 0 2px;
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--text-body);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2px;
+      height: 70px;
+      white-space: nowrap;
+    }
+
+    .emoji-icon { font-size: 26px; margin-bottom: 4px; display: inline-block; }
+
+    .transport-chip {
+      width: 100%;
+      min-height: 54px;
+      height: 54px;
+      flex-direction: row;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 12px;
+      font-size: 0.92rem;
+    }
+
+    .transport-chip .emoji-icon {
+      font-size: 20px;
+      margin-bottom: 0;
+    }
+
+    .grid-btn.active {
+      background: #eef5ff;
+      color: var(--primary-strong);
+      border: 2px solid var(--primary);
+      box-shadow: 0 14px 26px rgba(31, 75, 153, 0.14);
+      transform: translateY(-1px);
+    }
+
+    /* Minimal Inputs */
+    .minimal-input {
+        height: 42px; padding: 0 8px;
+        border: 1px solid var(--border-soft); border-radius: 14px; background: var(--surface-muted);
+        font-size: 0.86rem; font-weight: 600; color: var(--text-title);
+        text-align: center; transition: all 0.2s; width: 100%;
+    }
+    .minimal-input:focus {
+        background: #fff; border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(65, 105, 225, 0.1); outline: none;
+    }
+
+    .t-date { text-align: center; font-size: 0.9rem; letter-spacing: -0.5px; }
+    .t-time {
+        padding-right: 16px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: right 6px center;
+    }
+
+    .info-text {
+      font-size: 0.8rem;
+      color: var(--text-body);
+      margin-top: 8px;
+      margin-bottom: 0;
+      text-align: left;
+      line-height: 1.45;
+      padding: 10px 12px;
+      background: linear-gradient(180deg, #f8fbff 0%, #f3f7fb 100%);
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+    }
+
+    /* --- Buttons --- */
+    .main-button {
+      width: 100%; height: 46px;
+      background: var(--primary-gradient); color: white;
+      border: none; border-radius: var(--radius-md);
+      font-size: 0.95rem; font-weight: 800;
+      cursor: pointer; transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 12px 22px rgba(31, 75, 153, 0.22);
+      margin-top: 8px; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      letter-spacing: -0.02em;
+    }
+    .main-button:active { transform: scale(0.985); box-shadow: 0 10px 18px rgba(31, 75, 153, 0.2); }
+
+    .main-button.ready-to-go {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .main-button.secondary {
+      background: linear-gradient(180deg, #edf2f7 0%, #dbe5f1 100%);
+      box-shadow: none;
+      color: var(--text-title);
+    }
+
+    .btn-group { display: flex; justify-content: center; gap: 10px; margin-top: 16px; }
+    .btn-small {
+      padding: 10px 16px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.05);
+      background: #fff; color: var(--text-body); cursor: pointer; font-size: 0.85rem; font-weight: 600;
+      transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .btn-small:active { background: #F5F6FA; transform: scale(0.98); }
+
+    /* Animations */
+    @keyframes breathe {
+      0% { border-color: transparent; box-shadow: 0 0 0 0 rgba(65, 105, 225, 0); }
+      50% { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(65, 105, 225, 0.25); }
+      100% { border-color: transparent; box-shadow: 0 0 0 0 rgba(65, 105, 225, 0); }
+    }
+    .breathing-input { animation: breathe 1.5s infinite ease-in-out; z-index: 1; border-color: var(--primary) !important; }
+    .attention-required { animation: breathe 1.2s infinite ease-in-out; border-color: var(--accent-warning) !important; z-index: 2; }
+
+    /* --- Compact Timeline --- */
+    .traffic-row { display: flex; align-items: stretch; margin-bottom: 0; position: relative; }
+
+    /* Left Column */
+    .timeline-col { display: flex; flex-direction: column; align-items: center; width: 32px; flex-shrink: 0; padding-top: 12px; }
+    .timeline-marker { width: 10px; height: 10px; border-radius: 50%; background: #CBD5E1; z-index: 2; border: 2px solid #fff; box-shadow: 0 0 0 1px #CBD5E1; }
+    .timeline-marker.start { background: var(--primary); box-shadow: 0 0 0 2px rgba(65, 105, 225, 0.3); }
+    .timeline-marker.visit { background: var(--accent-success); box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3); }
+    .timeline-marker.end { background: var(--accent-danger); box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3); }
+
+    .timeline-line {
+        flex: 1; width: 2px; background: #E2E8F0;
+        margin-top: 0; margin-bottom: 0; min-height: 24px;
+    }
+    .traffic-row:last-child .timeline-line { display: none; }
+
+    /* Right Content */
+    .content-col { flex: 1; padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .route-label { font-size: 0.78rem; font-weight: 700; color: var(--text-title); width: 28px; text-align: center; flex-shrink: 0; }
+
+    /* Input Box */
+    .content-col input {
+        width: 100%; height: 36px; text-align: center; padding: 0 8px;
+        background: #fff; border: 1px solid #E2E8F0; border-radius: 10px;
+        font-size: 0.84rem; font-weight: 600; color: var(--text-title);
+        transition: 0.2s;
+    }
+    .content-col input::placeholder { color: var(--primary); opacity: 0.8; font-weight: 500; font-size: 0.85rem; }
+    .content-col input:not([readonly]):hover, .content-col input:not([readonly]):focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.1); }
+    .content-col input[readonly].static-input {
+      background: linear-gradient(180deg, #f3f7fb 0%, #edf2f7 100%);
+      color: #607086;
+      border-color: transparent;
+    }
+
+    /* Smart Side Buttons */
+     .side-btn {
+        width: 34px; height: 34px; border-radius: 10px; border: 1px solid #E2E8F0; background: #fff;
+        display: flex; align-items: center; justify-content: center; cursor: pointer;
+        transition: 0.2s; flex-shrink: 0; color: #94A3B8;
+    }
+    .side-btn:active { transform: scale(0.95); background: #F8FAFC; }
+
+    .side-btn.add { color: var(--primary); border-color: #E2E8F0; background: #F8FAFC; }
+    .side-btn.add:hover { background: #EFF6FF; border-color: #BFDBFE; }
+
+    .side-btn.del { color: var(--accent-danger); border-color: #E2E8F0; background: #F8FAFC; }
+    .side-btn.del:hover { background: #FEF2F2; border-color: #FECACA; }
+    .side-btn .icon-svg { width: 18px; height: 18px; }
+
+    .distance-result-box {
+        background: linear-gradient(180deg, #eefbf6 0%, #e5f8ef 100%);
+        border: 1px solid #b7e9cf;
+        border-radius: 18px;
+        padding: 16px;
+        margin-top: 16px;
+        text-align: center;
+        font-weight: 800;
+        color: #0b7c58;
+        transition: all 0.3s;
+        animation: popIn 0.4s;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Global Loading Overlay */
+    .loading-overlay {
+        display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+        background: rgba(20, 20, 30, 0.7);
+        backdrop-filter: blur(8px);
+        z-index: 9999;
+        flex-direction: column; justify-content: center; align-items: center;
+        color: #fff;
+    }
+
+    /* Pulse Circle Loader */
+    .loader-circle {
+      width: 42px;
+      height: 42px;
+      border: 4px solid rgba(255,255,255,0.25);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      margin-bottom: 18px;
+      animation: spin 0.9s linear infinite;
+    }
+
+    #loadingText { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.5px; opacity: 0.9; }
+
+    /* Search Result List Styles */
+    .search-result-item {
+        padding: 16px; border-bottom: 1px solid #F1F5F9; cursor: pointer; transition: background 0.2s;
+        display: flex; flex-direction: column; gap: 4px;
+    }
+    .search-result-item:active { background: #F8FAFC; }
+    .search-result-item:last-child { border-bottom: none; }
+
+    .place-name { font-size: 1rem; font-weight: 700; color: var(--text-title); }
+    .place-address { font-size: 0.85rem; color: #94A3B8; }
+    .place-badge { display: inline-block; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: #EFF6FF; color: var(--primary); margin-right: 6px; font-weight: 600; }
+
+    /* Spinner for Search List */
+    .spinner-sm {
+        width: 24px; height: 24px; border: 3px solid #E2E8F0;
+        border-top-color: var(--primary); border-radius: 50%;
+        display: inline-block; animation: spin 0.8s linear infinite;
+    }
+
+    /* Dashboard & Modal Styles */
+    .summary-badges {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: -8px 0 22px 0;
+    }
+    .summary-badge {
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(206, 219, 236, 0.92);
+      border-radius: 18px;
+      padding: 14px 12px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.04);
+    }
+    .summary-badge-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-label);
+      margin-bottom: 6px;
+    }
+    .summary-badge-value {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-title);
+      letter-spacing: -0.03em;
+    }
+    .total-sticky-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      background: linear-gradient(145deg, #163564 0%, #2356ac 100%);
+      color: #fff;
+      padding: 14px 16px;
+      border-radius: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 22px 42px -12px rgba(26, 57, 112, 0.5);
+      margin-bottom: 12px;
+      backdrop-filter: blur(10px);
+      transition: transform .3s;
+    }
+    .total-label { font-size: .76rem; opacity: .76; font-weight: 600; margin-bottom: 4px; }
+    .total-title { font-size: 0.96rem; font-weight: 800; letter-spacing: -0.03em; }
+    .total-amount { font-size: 1.44rem; font-weight: 800; letter-spacing: -0.06em; }
+    .dashboard-card {
+      background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+      border-radius: 22px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all .2s;
+      border: 1px solid rgba(215, 224, 237, 0.95);
+    }
+    .dashboard-card:active { transform: scale(.99); background: #f8fbff; }
+    .dashboard-card.readonly { cursor: default; }
+    .card-left { display: flex; align-items: center; gap: 14px; }
+    .card-icon-box {
+      width: 42px; height: 42px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45);
+    }
+    .card-info h4 { margin: 0; font-size: 0.92rem; font-weight: 800; color: var(--text-title); }
+    .card-info p { margin: 4px 0 0 0; font-size: .76rem; color: var(--text-label); font-weight: 600; line-height: 1.35; }
+    .card-right { text-align: right; }
+    .card-amount { font-size: 1.02rem; font-weight: 800; color: var(--primary-strong); letter-spacing: -0.03em; }
+    .card-action { color: #9aa8bc; margin-left: 8px; }
+    .action-card-btn {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border: 1.5px dashed #bdd0ea;
+      border-radius: 22px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all .2s;
+      color: var(--primary-strong);
+      font-weight: 700;
+      font-size: .9rem;
+      gap: 8px;
+    }
+    .file-box {
+      margin-top: 10px;
+      border: 1.5px dashed #a9c3ea;
+      border-radius: 18px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      background: linear-gradient(180deg, rgba(233,241,255,.9) 0%, rgba(248,251,255,.96) 100%);
+      transition: all .3s;
+      font-weight: 700;
+      color: var(--primary-strong);
+      font-size: .95rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .file-box.compact {
+      margin-top: 10px;
+      padding: 14px;
+      border: 1px solid #c6daf9;
+      background: #fff;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      box-shadow: 0 8px 18px rgba(31,75,153,.08);
+    }
+    .receipt-list { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
+    .receipt-wrapper {
+      background: linear-gradient(180deg, #f8fbff 0%, #f2f6fb 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(211, 223, 237, 0.92);
+      animation: popIn .3s;
+      overflow: hidden;
+    }
+    .receipt-card { display: flex; align-items: center; justify-content: space-between; padding: 12px; cursor: pointer; }
+    .receipt-info { display: flex; align-items: center; gap: 12px; overflow: hidden; flex: 1; }
+    .receipt-icon {
+      width: 42px; height: 42px; border-radius: 12px; background: #fff;
+      color: var(--primary); display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; border: 1px solid #d9e4f3;
+    }
+    .receipt-badge {
+      display: inline-block; font-size: .7rem; color: #fff; background: var(--primary);
+      padding: 3px 7px; border-radius: 999px; font-weight: 700; margin-right: 4px;
+    }
+    .receipt-name {
+      font-size: .9rem; color: var(--text-title); font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px;
+    }
+    .receipt-del { color: var(--accent-danger); cursor: pointer; padding: 8px; transition: .2s; margin-left: 8px; }
+    .receipt-preview-box { max-height: 0; overflow: hidden; transition: max-height .3s ease-out; background: #fff; border-top: 1px solid #e8eef6; text-align: center; }
+    .receipt-preview-box.open { max-height: 400px; border-bottom: 4px solid var(--primary); }
+    .receipt-preview-img { max-width: 100%; max-height: 250px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); object-fit: contain; }
+    .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;padding:16px;background:rgba(15,23,42,.42);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);z-index:2000;align-items:center;justify-content:center}.modal-box{background:#fff;padding:28px 22px 32px 22px;border-radius:28px;width:100%;max-width:540px;max-height:min(85vh,760px);overflow-y:auto;animation:popIn .24s ease;box-shadow:0 24px 60px rgba(15,23,42,.22);display:flex;flex-direction:column;border:1px solid rgba(224,231,242,.95)}@media (max-width:640px){.modal-overlay{padding:14px}.modal-box{max-width:100%;max-height:88vh;border-radius:24px;padding:24px 18px 26px 18px}}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal-title{font-size:1.3rem;font-weight:800;color:var(--text-title);display:flex;align-items:center;gap:8px}.modal-close{font-size:1.5rem;color:#94A3B8;cursor:pointer;padding:5px}.alert-content{text-align:center;padding:10px 0 30px 0}.alert-title{font-size:1.25rem;font-weight:800;color:var(--text-title);margin-bottom:10px}.alert-desc{font-size:.95rem;color:var(--text-body);line-height:1.5}.alert-icon{width:60px;height:60px;background:#EFF6FF;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary);margin:0 auto 20px auto;font-size:2rem}.modal-live-total{background:rgba(31,75,153,.08);color:var(--primary-strong);font-weight:700;padding:10px 16px;border-radius:14px;text-align:center;margin-bottom:16px;font-size:.95rem;display:flex;justify-content:space-between;align-items:center}@keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }@keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    @media (min-width: 900px) {
+      body {
+        padding: 8px 16px 22px 16px;
+      }
+      .container {
+        max-width: 580px;
+      }
+      .header {
+        margin-bottom: 8px;
+        padding-top: 2px;
+      }
+      .header h2 {
+        font-size: 1.18rem;
+      }
+      .step-indicator {
+        margin-bottom: 10px;
+      }
+      .section-card {
+        padding: 14px;
+        margin-bottom: 8px;
+        border-radius: 18px;
+      }
+      h3.section-title {
+        margin-bottom: 4px;
+        min-height: 30px;
+        font-size: 1rem;
+      }
+      .form-group {
+        margin-bottom: 10px;
+      }
+      input[type="text"], input[type="number"], select {
+        height: 44px;
+        font-size: 0.9rem;
+      }
+      .date-row-label {
+        margin-top: 4px;
+        margin-bottom: 4px;
+        font-size: 0.74rem;
+      }
+      .grid-date-row {
+        gap: 6px;
+      }
+      .minimal-input {
+        height: 38px;
+        font-size: 0.82rem;
+      }
+      .t-date {
+        font-size: 0.82rem;
+      }
+      .info-text {
+        margin-top: 6px;
+        margin-bottom: 0;
+        font-size: 0.76rem;
+      }
+      .transport-chip-group {
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+      .transport-chip {
+        width: 100%;
+        min-height: 46px;
+        height: 46px;
+        border-radius: 16px;
+        font-size: 0.8rem;
+        padding: 0 10px;
+      }
+      .transport-chip .emoji-icon {
+        font-size: 16px;
+      }
+      .content-col {
+        padding-bottom: 8px;
+      }
+      .timeline-col {
+        padding-top: 10px;
+      }
+      .content-col input,
+      .side-btn {
+        height: 34px;
+      }
+      .route-label {
+        font-size: 0.74rem;
+      }
+      .summary-badges {
+        gap: 7px;
+      }
+      .summary-badge {
+        padding: 8px 8px;
+        border-radius: 14px;
+      }
+      .summary-badge-label { font-size: 0.66rem; }
+      .summary-badge-value { font-size: 0.86rem; }
+      .dashboard-card { padding: 12px; border-radius: 16px; }
+      .card-icon-box { width: 40px; height: 40px; border-radius: 13px; }
+      .card-info h4 { font-size: 0.88rem; }
+      .card-info p { font-size: 0.74rem; }
+      .card-amount { font-size: 0.96rem; }
+      .subsection-title { font-size: 0.82rem; }
+      .subsection-note { font-size: 0.72rem; }
+    }
+  </style>
 </head>
 <body>
-자동으로 이동 중입니다...
+
+<div class="container">
+  <div class="header">
+    <h2>
+      <svg class="icon-svg" viewBox="0 0 24 24" style="width:28px; height:28px; color:var(--primary);"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
+      우성고 출장여비
+    </h2>
+  </div>
+
+  <div class="step-indicator">
+    <div class="step-dot active" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1Container" class="step-shell">
+    <div class="section-card" style="animation-delay: 0.1s;">
+      <h3 class="section-title">
+        <svg class="icon-svg" viewBox="0 0 24 24" style="color:#4169E1; margin-right:6px;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        출장 일정
+      </h3>
+
+      <div class="form-group" style="margin-bottom: 16px;">
+        <input type="text" id="applicantName" placeholder=" " required enterkeyhint="next">
+        <label>청구인 성명</label>
+      </div>
+
+      <div style="margin-top:10px;">
+        <div class="schedule-title">
+          <svg class="icon-svg" viewBox="0 0 24 24" style="width:16px; height:16px; color:var(--primary);"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          출장 시작 / 종료
+        </div>
+        <div class="date-row-label">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 12h20"></path><path d="M19 9l3 3-3 3"></path><path d="M2 12a9 9 0 0 1 12.39-8.45"></path></svg>
+          시작
+        </div>
+        <div class="grid-date-row">
+            <input type="text" id="startDate" class="minimal-input t-date" placeholder="날짜 선택" readonly>
+            <select id="startHour" class="minimal-input t-time"></select>
+            <select id="startMin" class="minimal-input t-time"></select>
+        </div>
+
+        <div class="date-row-label">
+          <svg class="icon-svg" viewBox="0 0 24 24" style="transform: rotate(180deg);"><path d="M2 12h20"></path><path d="M19 9l3 3-3 3"></path><path d="M2 12a9 9 0 0 1 12.39-8.45"></path></svg>
+          종료
+        </div>
+        <div class="grid-date-row">
+            <input type="text" id="endDate" class="minimal-input t-date" placeholder="날짜 선택" readonly>
+            <select id="endHour" class="minimal-input t-time"></select>
+            <select id="endMin" class="minimal-input t-time"></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-card" id="routeSectionCard" style="animation-delay: 0.2s;">
+      <h3 class="section-title" id="routeSectionTitle">
+        <span id="routeTitleText" style="display:flex; align-items:center;">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="color:#10B981; margin-right:6px;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+            출장 경로
+        </span>
+      </h3>
+      <input type="hidden" id="travelType" value="domestic">
+
+      <!-- 타임라인 컨테이너 -->
+      <div id="timelineContainer" style="margin-bottom: 10px;"></div>
+
+      <!-- 결과 박스 -->
+      <div id="routeDistanceBox" class="distance-result-box hidden">
+         <span id="routeDistanceMsg"></span>
+      </div>
+    </div>
+
+    <div class="section-card" id="transportSectionCard" style="animation-delay: 0.3s;">
+      <h3 class="section-title">
+        <span class="transport-title-row">
+          <span class="transport-title-left">
+            <svg class="icon-svg" viewBox="0 0 24 24" style="color:#4169E1; margin-right:6px;"><path d="M9 18l6-6-6-6"></path><path d="M15 12H3"></path><path d="M21 5v14"></path></svg>
+            이동수단
+          </span>
+          <span class="transport-extra-row hidden" id="transportExtraRow">
+            <label class="overseas-check-inline" for="overseasTripCheck" title="해외출장 안내 보기">
+              <input type="checkbox" id="overseasTripCheck" onchange="toggleOverseasTrip(this.checked)">
+              <span class="custom-check"></span>
+              <span>해외출장</span>
+            </label>
+          </span>
+        </span>
+      </h3>
+      <div class="transport-chip-group">
+        <div class="grid-btn transport-chip" data-value="private" onclick="selectTransport('private', this)">
+            <span class="emoji-icon">🚘</span>
+            개인차량
+        </div>
+        <div class="grid-btn transport-chip" data-value="public_transport" onclick="selectTransport('public_transport', this)">
+            <span class="emoji-icon">🚆</span>
+            대중교통
+        </div>
+        <div class="grid-btn transport-chip" data-value="company_car" onclick="selectTransport('company_car', this)">
+             <span class="emoji-icon">🚌</span>
+            공용차량
+        </div>
+        <div class="grid-btn transport-chip" data-value="companion" onclick="selectTransport('companion', this)">
+             <span class="emoji-icon">👥</span>
+            차량동승
+        </div>
+      </div>
+      <input type="hidden" id="transportationType">
+      <div id="transportationInfo" class="info-text">출장 경로를 입력한 뒤 이동수단을 선택해주세요.</div>
+    </div>
+
+    <button class="main-button" id="mainStepBtn" onclick="handleMainBtnClick()">
+      이동수단 선택 후 계속하기
+    </button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2Container" class="hidden step-shell">
+    <div class="total-sticky-bar">
+      <div>
+        <div class="total-label">예상 지급 금액</div>
+        <div class="total-title">이번 출장 정산 요약</div>
+      </div>
+      <div class="total-amount" id="grandTotal">0원</div>
+    </div>
+
+    <div class="summary-badges">
+      <div class="summary-badge">
+        <div class="summary-badge-label">출장 기간</div>
+        <div class="summary-badge-value" id="summaryTripDays">0일</div>
+      </div>
+      <div class="summary-badge">
+        <div class="summary-badge-label">운행 거리</div>
+        <div class="summary-badge-value" id="summaryTotalKm">0km</div>
+      </div>
+      <div class="summary-badge">
+        <div class="summary-badge-label">이동 수단</div>
+        <div class="summary-badge-value" id="summaryTransport">미선택</div>
+      </div>
+    </div>
+
+    <div class="subsection-label">
+      <div class="subsection-title">자동 계산 항목</div>
+      <div class="subsection-note">입력값 기준 즉시 반영</div>
+    </div>
+
+    <div class="dashboard-card readonly">
+      <div class="card-left">
+        <div class="card-icon-box" style="background:#EFF6FF; color:#4169E1;">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 20a6 6 0 0 1-12 0V9a9 9 0 0 1 18 0v11"></path><path d="M16 19h4a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H4.5"></path><path d="M15 3h6"></path><path d="M15 6h6"></path></svg>
+        </div>
+        <div class="card-info">
+          <h4>교통비</h4>
+          <p id="dashTrafficDetail">정보 없음</p>
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="card-amount" id="dashTrafficAmount">0원</div>
+      </div>
+    </div>
+
+    <div class="dashboard-card readonly">
+      <div class="card-left">
+        <div class="card-icon-box" style="background:#FFFBEB; color:#F59E0B;">
+          <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><line x1="12" y1="18" x2="12" y2="22"></line><line x1="12" y1="2" x2="12" y2="6"></line></svg>
+        </div>
+        <div class="card-info">
+          <h4>일비</h4>
+          <p id="dashAllowanceDetail">정보 없음</p>
+        </div>
+      </div>
+      <div class="card-right">
+        <div class="card-amount" id="dashAllowanceAmount">0원</div>
+      </div>
+    </div>
+
+    <div class="subsection-label">
+      <div class="subsection-title">실비 첨부 항목</div>
+      <div class="subsection-note">영수증 첨부 후 금액 입력</div>
+    </div>
+
+    <div id="btnAddLodging" class="action-card-btn" onclick="openModal('lodging')">
+      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      숙박비 추가
+    </div>
+    <div id="cardLodging" class="dashboard-card hidden" onclick="openModal('lodging')">
+      <div class="card-left">
+        <div class="card-icon-box" style="background:#F3F0FF; color:#8B5CF6;">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 4v16"></path><path d="M2 8h18a2 2 0 0 1 2 2v10"></path><path d="M2 17h5a3 3 0 0 0 3-3v-2.5a2 2 0 0 1 2-2 2 2 0 0 1 2 2V14a3 3 0 0 0 3 3h5"></path></svg>
+        </div>
+        <div class="card-info">
+          <h4>숙박비</h4>
+          <p id="summaryLodging">입력하려면 터치</p>
+        </div>
+      </div>
+      <div class="card-right" style="display:flex; align-items:center;">
+        <div class="card-amount" id="dashLodgingAmount">0원</div>
+        <div class="card-action"><svg class="icon-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+      </div>
+    </div>
+
+    <div id="btnAddMeal" class="action-card-btn" onclick="openModal('meal')">
+      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      식비 추가
+    </div>
+    <div id="cardMeal" class="dashboard-card hidden" onclick="openModal('meal')">
+      <div class="card-left">
+        <div class="card-icon-box" style="background:#FFF1F2; color:#F43F5E;">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+        </div>
+        <div class="card-info">
+          <h4>식비</h4>
+          <p id="summaryMeal">입력하려면 터치</p>
+        </div>
+      </div>
+      <div class="card-right" style="display:flex; align-items:center;">
+        <div class="card-amount" id="dashMealAmount">0원</div>
+        <div class="card-action"><svg class="icon-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+      </div>
+    </div>
+
+    <div id="btnAddOther" class="action-card-btn" onclick="openModal('other')">
+      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      기타 실비 추가
+    </div>
+    <div id="cardOther" class="dashboard-card hidden" onclick="openModal('other')">
+      <div class="card-left">
+        <div class="card-icon-box" style="background:#F1F5F9; color:#64748B;">
+          <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <div class="card-info">
+          <h4>기타 실비</h4>
+          <p id="summaryOther">입력하려면 터치</p>
+        </div>
+      </div>
+      <div class="card-right" style="display:flex; align-items:center;">
+        <div class="card-amount" id="dashOtherAmount">0원</div>
+        <div class="card-action"><svg class="icon-svg" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="main-button secondary" id="backToStep1Btn" style="flex:1;">이전</button>
+      <button class="main-button" id="finalSubmitBtn" style="flex:2;">정산 신청 완료</button>
+    </div>
+  </div>
+</div>
+
+<!-- ────────────────── MODALS ────────────────── -->
+<div id="modalOverseasGuide" class="modal-overlay">
+  <div class="modal-box" style="max-width:430px;">
+    <div class="alert-content" style="padding-bottom:18px;">
+      <div class="alert-icon" style="font-size:2rem;">✈️</div>
+      <div class="alert-title">해외출장 입력 안내</div>
+      <div class="alert-desc" style="text-align:left; background:#F8FAFC; border-radius:18px; padding:16px; font-size:0.95rem;">
+        해외출장은 해외 목적지가 아니라,<br>
+        <strong>국내 공항 이동 구간</strong>만 입력해주세요.<br><br>
+        <strong>예)</strong><br>
+        우성고등학교 → 인천공항 → 우성고등학교<br>
+        우성고등학교 → 김포공항 → 우성고등학교<br><br>
+        개인차량 이용 시 공항까지의 유류비가 계산됩니다.<br>
+        톨비·주차비·공항버스·공항철도 등은 <strong>기타 실비</strong>에 첨부해주세요.
+      </div>
+    </div>
+    <button class="main-button" onclick="document.getElementById('modalOverseasGuide').style.display='none'">확인하고 입력하기</button>
+  </div>
+</div>
+
+<div id="modalConfirm" class="modal-overlay">
+  <div class="modal-box" style="max-width:400px;">
+    <div class="alert-content">
+      <div class="alert-icon"><svg class="icon-svg" viewBox="0 0 24 24" style="width:32px; height:32px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+      <div class="alert-title">정산 신청을 제출할까요?</div>
+      <div class="alert-desc">작성하신 내용은 담당자에게 전송됩니다.</div>
+    </div>
+    <div style="display:flex; gap:12px; margin-top:10px;">
+      <button class="main-button secondary" onclick="document.getElementById('modalConfirm').style.display='none'" style="flex:1;">취소</button>
+      <button class="main-button" onclick="window.doFinalSubmit()" style="flex:1;">제출하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 숙박비, 식비, 기타 모달은 기존과 동일 구조 유지 (생략 없이 포함) -->
+<div id="modalLodging" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M2 4v16"></path><path d="M2 8h18a2 2 0 0 1 2 2v10"></path><path d="M2 17h5a3 3 0 0 0 3-3v-2.5a2 2 0 0 1 2-2 2 2 0 0 1 2 2V14a3 3 0 0 0 3 3h5"></path></svg> 숙박비 입력</div>
+      <div class="modal-close" onclick="closeModal('lodging')"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>
+    </div>
+    <!-- [수정 ⑨] 숙박 가능 박수 안내 -->
+    <p id="lodgingEligibleMsg" style="font-size:0.9rem; font-weight:600; padding:12px; border-radius:14px; text-align:center; margin:0 0 14px 0; background:#F8FAFC;"></p>
+    <div class="modal-live-total"><span>현재 입력 합계</span><span id="liveLodgingTotal" style="font-size:1.2rem; font-weight:800;">0원</span></div>
+    <div class="form-group">
+      <select id="lodgingType"><option value="0" hidden></option><option value="70000">그밖의 지역 (7만원)</option><option value="80000">광역시 (8만원)</option><option value="100000">서울 (10만원)</option></select>
+      <label>지역 선택 (필수)</label>
+    </div>
+    <div id="lodgingFileList" class="receipt-list"></div>
+    <div class="file-box" id="lodgingFileBox" onclick="window.handleFileBoxClick('lodgingType', 'lodgingFile', '숙박')"><svg class="icon-svg pulse-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> 숙박 영수증 첨부</div>
+    <input type="file" id="lodgingFile" hidden accept="image/*,application/pdf">
+    <button class="main-button" onclick="saveAndCloseModal('lodging')" style="margin-top:20px;">저장 완료</button>
+  </div>
+</div>
+
+<div id="modalMeal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg> 식비 입력</div>
+      <div class="modal-close" onclick="closeModal('meal')"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>
+    </div>
+    <p id="mealEligibleMsg" style="font-size:0.95rem; font-weight:600; padding:16px; border-radius:16px; text-align:center; margin-bottom:20px;"></p>
+    <div id="mealFileList" class="receipt-list"></div>
+    <div class="file-box" id="mealFileBox" onclick="window.handleFileBoxClick('', 'mealFile', '식비')"><svg class="icon-svg pulse-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> 식비 영수증 첨부</div>
+    <input type="file" id="mealFile" hidden multiple accept="image/*,application/pdf">
+    <button class="main-button" onclick="saveAndCloseModal('meal')" style="margin-top:20px;">저장 완료</button>
+  </div>
+</div>
+
+<div id="modalOther" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> 기타 실비 입력</div>
+      <div class="modal-close" onclick="closeModal('other')"><svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>
+    </div>
+    <div class="modal-live-total"><span>현재 입력 합계</span><span id="liveOtherTotal" style="font-size:1.2rem; font-weight:800;">0원</span></div>
+    <div class="form-group">
+      <select id="otherType"><option value="" hidden></option><option value="toll">톨게이트비</option><option value="parking">주차비</option><option value="public">대중교통</option></select>
+      <label>항목 선택 (필수)</label>
+    </div>
+    <div id="otherFileList" class="receipt-list"></div>
+    <div class="file-box" id="otherFileBox" onclick="window.handleFileBoxClick('otherType', 'otherFile', '기타')"><svg class="icon-svg pulse-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> 영수증 첨부</div>
+    <input type="file" id="otherFile" hidden accept="image/*,application/pdf">
+    <button class="main-button" onclick="saveAndCloseModal('other')" style="margin-top:20px;">저장 완료</button>
+  </div>
+</div>
+
+<!-- 검색 모달 -->
+<div id="searchModal" class="modal-overlay">
+  <div class="modal-box" style="height:80vh; max-height:80vh;">
+    <div class="modal-header" style="margin-bottom:10px;">
+        <div class="modal-title">장소 검색</div>
+        <div class="modal-close" onclick="document.getElementById('searchModal').style.display='none'">
+            <svg class="icon-svg" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </div>
+    </div>
+    <div style="display:flex; gap:10px; margin-bottom:15px;">
+      <input type="text" id="searchInput" placeholder="예: 경기도교육청" enterkeyhint="search" style="text-align:left;">
+      <button class="main-button" id="doSearchBtn" style="width:56px; margin:0; height:56px; border-radius:14px; box-shadow:none;">
+        <svg class="icon-svg" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      </button>
+    </div>
+    <div id="searchResultList" style="flex:1; overflow-y:auto; border-top:1px solid #F0F0F0; padding-top:5px; min-height:200px;">
+        <div style="text-align:center; color:#94A3B8; padding:40px 0; font-size:0.9rem;">
+            검색어를 입력하고<br>돋보기를 눌러주세요.
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<div id="modalSuccess" class="modal-overlay">
+  <div class="modal-box" style="max-width:400px;">
+    <div class="alert-content">
+      <div class="alert-icon"><svg class="icon-svg" viewBox="0 0 24 24" style="width:32px; height:32px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+      <div class="alert-title">제출이 완료되었습니다</div>
+      <div class="alert-desc">정산 신청이 정상적으로 접수되었습니다. 확인을 누르면 처음 화면으로 돌아갑니다.</div>
+    </div>
+    <button class="main-button" onclick="goHomeAfterSubmit()">확인</button>
+  </div>
+</div>
+
+<!-- [수정] 뷰티풀 로딩 오버레이 -->
+
+<div id="loading" class="loading-overlay">
+  <div class="loader-circle"></div>
+  <div id="loadingText">계산 중</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/air-datepicker@3.5.0/air-datepicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+  /* [수정 ⑯] Apps Script 웹 앱 배포 URL (배포 > 배포 관리에서 복사한 .../exec 주소) */
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzCNNyIU5-Dlx99p8mubKbRSAkwzl_6uG55Lt5hZVpcf2c6fVDAtddCr9txdk5Fl-ij/exec';
+
+  /* google.script.run 대신 fetch로 Apps Script API를 호출한다.
+     Content-Type을 text/plain으로 보내야 브라우저가 사전 요청(CORS preflight)을 하지 않아 Apps Script와 바로 통신된다. */
+  async function callServer(action, payload) {
+    if (API_URL.includes('여기에_배포_ID')) {
+      throw new Error('API_URL이 설정되지 않았습니다. index.html 상단의 API_URL을 입력해주세요.');
+    }
+    let response;
+    try {
+      response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action, payload })
+      });
+    } catch (networkError) {
+      throw new Error('서버에 연결할 수 없습니다. 인터넷 연결을 확인해주세요.');
+    }
+    if (!response.ok) throw new Error(`서버 응답 오류 (${response.status})`);
+    let json;
+    try {
+      json = await response.json();
+    } catch (parseError) {
+      throw new Error('서버 응답을 읽을 수 없습니다. Apps Script 배포 설정(액세스: 모든 사용자)을 확인해주세요.');
+    }
+    if (!json.ok) throw new Error(json.error || '서버 처리 중 오류가 발생했습니다.');
+    return json.data;
+  }
+
+  const APP_DATA = {
+    files: {},
+    drafts: {
+      lodging: [],
+      meal: [],
+      other: []
+    },
+    totalKm: 0,
+    tripDays: 0,
+    nights: 0,
+    dailyAllowance: 0,
+    trafficCost: 0,
+    currentFocusSearchInput: null,
+    isDistanceCalculated: false,
+    overseasGuideShown: false,
+    mealEligibleDays: 0
+  };
+
+  const ICONS = {
+    trash: `<svg class="icon-svg" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
+    file: `<svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
+    plus: `<svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+    camera: `<svg class="icon-svg pulse-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`
+  };
+
+  const PRIMARY_LOCATION = '우성고등학교';
+  const RESTRICTED_AREAS = ['군포', '의왕', '안양', '과천'];
+  const CATEGORY_DRAFT_KEY = { '숙박': 'lodging', '식비': 'meal', '기타': 'other' };
+
+  /* [수정 ⑩] 관내 지역 판별: 주소가 있으면 주소의 '○○시' 단위로 판별하고,
+     주소가 없을 때만 장소 이름으로 판별한다.
+     (예: 서울 양천구 '안양천로'는 관내가 아니고, 이름에 '안양'이 없는 안양시 소재 장소는 관내) */
+  function isRestrictedPlace(name, address) {
+    const addr = String(address || '').trim();
+    if (addr) {
+      const tokens = addr.split(/[\s/|,]+/);
+      return RESTRICTED_AREAS.some(area => tokens.includes(area + '시'));
+    }
+    return RESTRICTED_AREAS.some(area => String(name || '').includes(area));
+  }
+
+  function getSelectedTransportType() {
+    return document.getElementById('transportationType').value;
+  }
+
+  function isPrivateTransport() {
+    return getSelectedTransportType() === 'private';
+  }
+
+  /* [수정 ③] 공용차량·차량동승은 모두 차량 제공 단체출장 → 일비 1/2 감액 */
+  function isSharedVehicleTransport() {
+    const value = getSelectedTransportType();
+    return value === 'company_car' || value === 'companion';
+  }
+
+  function goToStep2() {
+    initDashboard();
+    document.getElementById('step1Container').classList.add('hidden');
+    document.getElementById('step2Container').classList.remove('hidden');
+    document.getElementById('dot1').classList.remove('active');
+    document.getElementById('dot2').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function toast(msg, type = 'error') {
+    const background = type === 'info'
+      ? 'linear-gradient(to right, #1f4b99, #2f6fd6)'
+      : 'linear-gradient(to right, #EF4444, #DC2626)';
+    Toastify({ text: msg, duration: 3000, gravity: "top", position: "center", style: { background, borderRadius: "16px", fontWeight: "700", boxShadow: "0 5px 15px rgba(0,0,0,0.2)" } }).showToast();
+  }
+  function showLoading(show, text) {
+      const loader = document.getElementById('loading');
+      if(text) document.getElementById('loadingText').innerText = text;
+      loader.style.display = show ? 'flex' : 'none';
+  }
+
+  function showSuccessModal() {
+      document.getElementById('modalSuccess').style.display = 'flex';
+  }
+
+  function updateSummaryBadges() {
+    const tripDaysEl = document.getElementById('summaryTripDays');
+    const totalKmEl = document.getElementById('summaryTotalKm');
+    const transportEl = document.getElementById('summaryTransport');
+    const transportMap = {
+      private: '개인차량',
+      public_transport: '대중교통',
+      company_car: '공용차량',
+      companion: '차량동승'
+    };
+
+    if (tripDaysEl) {
+      tripDaysEl.innerText = APP_DATA.tripDays > 0 ? `${APP_DATA.tripDays}일` : '0일';
+    }
+    if (totalKmEl) {
+      totalKmEl.innerText = APP_DATA.totalKm > 0 ? `${APP_DATA.totalKm}km` : '0km';
+    }
+    if (transportEl) {
+      transportEl.innerText = transportMap[getSelectedTransportType()] || '미선택';
+    }
+  }
+
+  function revokePreviewUrl(entry) {
+    if (entry && entry.previewUrl) {
+      URL.revokeObjectURL(entry.previewUrl);
+    }
+  }
+
+  function releaseAllLocalFiles() {
+    Object.values(APP_DATA.files).forEach(revokePreviewUrl);
+    Object.values(APP_DATA.drafts).forEach(items => items.forEach(revokePreviewUrl));
+  }
+
+  function getTravelWindow() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const startTime = `${document.getElementById('startHour').value}:${document.getElementById('startMin').value}`;
+    const endTime = `${document.getElementById('endHour').value}:${document.getElementById('endMin').value}`;
+
+    if (!startDate || !endDate) return null;
+
+    const start = new Date(`${startDate}T${startTime}:00`);
+    const end = new Date(`${endDate}T${endTime}:00`);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+
+    return { startDate, endDate, startTime, endTime, start, end };
+  }
+
+  function validateTravelWindow(showMessage = true) {
+    const windowInfo = getTravelWindow();
+    if (!windowInfo) {
+      if (showMessage) toast('출장 일시를 입력해주세요.');
+      return null;
+    }
+    if (windowInfo.end.getTime() <= windowInfo.start.getTime()) {
+      if (showMessage) toast('출장 종료 일시는 시작 일시보다 늦어야 합니다.');
+      return null;
+    }
+    return windowInfo;
+  }
+
+  /* [수정 ⑦] 출장 기간을 하루씩 순회해 식비 조건을 충족하는 날 수를 센다.
+     - 시작 10시 이전
+     - 점심시간(12~13시) 포함
+     - 그날 출장 시간 3시간 이상
+     중간 날(00:00~24:00)은 자동으로 조건을 만족한다. */
+  function getMealEligibleDays(start, end) {
+    const MS_DAY = 24 * 60 * 60 * 1000;
+    const firstDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const lastDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    let count = 0;
+
+    for (let d = new Date(firstDay); d <= lastDay; d = new Date(d.getTime() + MS_DAY)) {
+      const dayOpen = new Date(d);
+      const dayClose = new Date(d.getTime() + MS_DAY);
+
+      const s = start > dayOpen ? start : dayOpen;
+      const e = end < dayClose ? end : dayClose;
+      if (e <= s) continue;
+
+      const tenAM = new Date(d); tenAM.setHours(10, 0, 0, 0);
+      const lunchFrom = new Date(d); lunchFrom.setHours(12, 0, 0, 0);
+      const lunchTo = new Date(d); lunchTo.setHours(13, 0, 0, 0);
+
+      const startedEarly = s <= tenAM;
+      const coversLunch = s <= lunchFrom && e >= lunchTo;
+      const longEnough = (e - s) >= 3 * 60 * 60 * 1000;
+
+      if (startedEarly && coversLunch && longEnough) count++;
+    }
+
+    return count;
+  }
+
+  function getRecognizedAmount(category, subCategory, amount) {
+    const numericAmount = parseInt(amount, 10) || 0;
+    if (category === '식비') return Math.min(numericAmount, 8330);
+    if (category === '숙박') {
+      let cap = 70000;
+      const sub = subCategory || '';
+      if (sub.includes('서울')) cap = 100000;
+      else if (sub.includes('광역시')) cap = 80000;
+      return Math.min(numericAmount, cap);
+    }
+    return numericAmount;
+  }
+
+  function getCategoryTotal(category, useRecognized = false) {
+    return Object.values(APP_DATA.files)
+      .filter(file => file.category === category)
+      .reduce((sum, file) => {
+        const amount = useRecognized
+          ? getRecognizedAmount(file.category, file.subCategory, file.amount)
+          : (parseInt(file.amount, 10) || 0);
+        return sum + amount;
+      }, 0);
+  }
+
+  /* [수정 ⑨] 카테고리별 첨부 개수 / 첨부 한도 */
+  function getCategoryCount(category) {
+    const draftKey = CATEGORY_DRAFT_KEY[category];
+    const saved = Object.values(APP_DATA.files).filter(f => f.category === category).length;
+    const drafts = draftKey ? APP_DATA.drafts[draftKey].length : 0;
+    return saved + drafts;
+  }
+
+  function getReceiptLimit(category) {
+    if (category === '식비') return APP_DATA.mealEligibleDays;
+    if (category === '숙박') return APP_DATA.nights;
+    return Infinity;
+  }
+
+  function getReceiptLimitMessage(category, limit) {
+    if (category === '숙박') {
+      return limit === 0
+        ? '당일 출장은 숙박비를 청구할 수 없습니다.'
+        : `숙박 영수증은 숙박 일수(${limit}박)만큼만 첨부할 수 있습니다.`;
+    }
+    if (category === '식비') {
+      return limit === 0
+        ? '현재 출장 시간 조건으로는 식비를 청구할 수 없습니다.'
+        : `식비 영수증은 조건 충족일 기준 최대 ${limit}개까지 첨부 가능합니다.`;
+    }
+    return '';
+  }
+
+  function isValidReceiptAmount(amount) {
+    return (parseInt(amount, 10) || 0) > 0;
+  }
+
+  function getRouteRows() {
+    return Array.from(document.querySelectorAll('.dynamic-row'));
+  }
+
+  function getRouteStops() {
+    return getRouteRows()
+      .map(row => row.querySelector('.dest')?.value?.trim() || '')
+      .filter(Boolean);
+  }
+
+  /* [수정 ⑩] 서버 검증용으로 목적지 이름과 주소를 함께 전달 */
+  function getRouteStopDetails() {
+    return getRouteRows()
+      .map(row => ({
+        name: row.querySelector('.dest')?.value?.trim() || '',
+        address: row.querySelector('.dest-addr')?.value?.trim() || ''
+      }))
+      .filter(stop => stop.name);
+  }
+
+  function buildRoutePath() {
+    const stops = getRouteStops();
+    return [PRIMARY_LOCATION, ...stops, PRIMARY_LOCATION].join(' → ');
+  }
+
+  function buildSegmentsPayload() {
+    const segments = [];
+    const points = [{ name: PRIMARY_LOCATION }];
+
+    getRouteRows().forEach(row => {
+      const name = row.querySelector('.dest').value.trim();
+      const x = row.querySelector('.dest-x').value;
+      const y = row.querySelector('.dest-y').value;
+      const address = row.querySelector('.dest-addr').value;
+      const point = { name };
+      if (x && y) {
+        point.x = x;
+        point.y = y;
+      }
+      if (address) point.address = address;
+      points.push(point);
+    });
+
+    points.push({ name: PRIMARY_LOCATION });
+
+    for (let i = 0; i < points.length - 1; i++) {
+      segments.push({ origin: points[i], destination: points[i + 1] });
+    }
+
+    return segments;
+  }
+
+  /* [수정 ⑦·⑨] 출장 일정이 바뀌어 한도가 줄면 초과분(최근 첨부부터)을 잘라낸다. 식비·숙박 공용 */
+  function trimCategoryEntries(category, limit) {
+    const draftKey = CATEGORY_DRAFT_KEY[category];
+    const savedIds = Object.entries(APP_DATA.files)
+      .filter(([_, f]) => f.category === category)
+      .map(([id]) => id);
+    const drafts = APP_DATA.drafts[draftKey];
+    let total = savedIds.length + drafts.length;
+    if (total <= limit) return;
+
+    while (total > limit && drafts.length) {
+      revokePreviewUrl(drafts.pop());
+      total--;
+    }
+    while (total > limit && savedIds.length) {
+      const id = savedIds.pop();
+      revokePreviewUrl(APP_DATA.files[id]);
+      delete APP_DATA.files[id];
+      total--;
+    }
+
+    renderReceiptList(draftKey);
+    updateTotal();
+    toast(limit === 0
+      ? `출장 일정 조건이 바뀌어 기존 ${category} 영수증을 제외했습니다.`
+      : `${category} 정산 가능 개수가 ${limit}개로 줄어 초과 영수증을 제외했습니다.`);
+  }
+
+  function resetAppToInitialState() {
+      releaseAllLocalFiles();
+      // 데이터 초기화
+      APP_DATA.files = {};
+      APP_DATA.drafts = { lodging: [], meal: [], other: [] };
+      APP_DATA.totalKm = 0;
+      APP_DATA.tripDays = 0;
+      APP_DATA.nights = 0;
+      APP_DATA.dailyAllowance = 0;
+      APP_DATA.trafficCost = 0;
+      APP_DATA.currentFocusSearchInput = null;
+      APP_DATA.isDistanceCalculated = false;
+      APP_DATA.overseasGuideShown = false;
+      APP_DATA.mealEligibleDays = 0;
+      updateSummaryBadges();
+
+      // 기본 입력 초기화
+      const applicantName = document.getElementById('applicantName');
+      const transportationType = document.getElementById('transportationType');
+      const travelType = document.getElementById('travelType');
+      const transportationInfo = document.getElementById('transportationInfo');
+      if (applicantName) applicantName.value = '';
+      if (transportationType) transportationType.value = '';
+      if (travelType) travelType.value = 'domestic';
+      if (transportationInfo) transportationInfo.innerText = '출장 경로를 입력한 뒤 이동수단을 선택해주세요.';
+
+      const overseasTripCheck = document.getElementById('overseasTripCheck');
+      if (overseasTripCheck) overseasTripCheck.checked = false;
+
+      document.querySelectorAll('.grid-btn').forEach(btn => btn.classList.remove('active'));
+
+      const startDate = document.getElementById('startDate');
+      const endDate = document.getElementById('endDate');
+      const startHour = document.getElementById('startHour');
+      const startMin = document.getElementById('startMin');
+      const endHour = document.getElementById('endHour');
+      const endMin = document.getElementById('endMin');
+
+      if (startDate) startDate.value = '';
+      if (endDate) endDate.value = '';
+      if (startHour) startHour.value = '09';
+      if (startMin) startMin.value = '00';
+      if (endHour) endHour.value = '17';
+      if (endMin) endMin.value = '00';
+
+      const lodgingType = document.getElementById('lodgingType');
+      const otherType = document.getElementById('otherType');
+      if (lodgingType) {
+        lodgingType.selectedIndex = 0;
+        lodgingType.classList.remove('has-value', 'attention-required');
+      }
+      if (otherType) {
+        otherType.selectedIndex = 0;
+        otherType.classList.remove('has-value', 'attention-required');
+      }
+
+      // 파일 input / 리스트 초기화
+      ['lodgingFile', 'mealFile', 'otherFile'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+
+      ['lodgingFileList', 'mealFileList', 'otherFileList'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
+      });
+
+      // 경로 및 계산 상태 초기화
+      initSegmentList();
+      const routeDistanceBox = document.getElementById('routeDistanceBox');
+      const routeDistanceMsg = document.getElementById('routeDistanceMsg');
+      if (routeDistanceBox) routeDistanceBox.classList.add('hidden');
+      if (routeDistanceMsg) routeDistanceMsg.innerText = '';
+
+      const mainBtn = document.getElementById('mainStepBtn');
+      if (mainBtn) {
+        mainBtn.innerHTML = '이동수단 선택 후 계속하기';
+        mainBtn.classList.remove('ready-to-go');
+      }
+
+      // 대시보드 초기화
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = value;
+      };
+
+      setText('grandTotal', '0원');
+      setText('dashTrafficDetail', '정보 없음');
+      setText('dashTrafficAmount', '0원');
+      setText('dashAllowanceDetail', '정보 없음');
+      setText('dashAllowanceAmount', '0원');
+      setText('dashLodgingAmount', '0원');
+      setText('summaryLodging', '입력하려면 터치');
+      setText('dashMealAmount', '0원');
+      setText('summaryMeal', '입력하려면 터치');
+      setText('dashOtherAmount', '0원');
+      setText('summaryOther', '입력하려면 터치');
+      setText('liveLodgingTotal', '0원');
+      setText('liveOtherTotal', '0원');
+
+      ['mealEligibleMsg', 'lodgingEligibleMsg'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.innerHTML = '';
+          el.style.color = '';
+        }
+      });
+
+      const showBtnHideCard = (btnId, cardId) => {
+        const btn = document.getElementById(btnId);
+        const card = document.getElementById(cardId);
+        if (btn) {
+          btn.classList.remove('hidden');
+          btn.style.display = '';
+        }
+        if (card) card.classList.add('hidden');
+      };
+      showBtnHideCard('btnAddLodging', 'cardLodging');
+      showBtnHideCard('btnAddMeal', 'cardMeal');
+      showBtnHideCard('btnAddOther', 'cardOther');
+
+      // 입력 강조 초기화
+      document.querySelectorAll('input, select').forEach(el => {
+        el.classList.remove('has-value', 'breathing-input', 'attention-required');
+      });
+
+      // 모달 닫기
+      ['modalSuccess', 'modalConfirm', 'modalOverseasGuide', 'modalLodging', 'modalMeal', 'modalOther', 'searchModal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+
+      // 1단계로 복귀
+      const step1 = document.getElementById('step1Container');
+      const step2 = document.getElementById('step2Container');
+      const dot1 = document.getElementById('dot1');
+      const dot2 = document.getElementById('dot2');
+      if (step2) step2.classList.add('hidden');
+      if (step1) step1.classList.remove('hidden');
+      if (dot2) dot2.classList.remove('active');
+      if (dot1) dot1.classList.add('active');
+
+      updateTotal();
+      updateTravelModeUI(false);
+      updateInputGuide();
+      window.scrollTo(0, 0);
+  }
+
+  function goHomeAfterSubmit() {
+      resetAppToInitialState();
+  }
+
+  function readFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+      });
+  }
+
+  function compressImageFile(file, maxSize = 1400, quality = 0.82) {
+      return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+              const img = new Image();
+              img.onload = () => {
+                  let { width, height } = img;
+                  if (width > height && width > maxSize) {
+                      height = Math.round(height * (maxSize / width));
+                      width = maxSize;
+                  } else if (height >= width && height > maxSize) {
+                      width = Math.round(width * (maxSize / height));
+                      height = maxSize;
+                  }
+
+                  const canvas = document.createElement('canvas');
+                  canvas.width = width;
+                  canvas.height = height;
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, width, height);
+
+                  const outputType = 'image/jpeg';
+                  const dataUrl = canvas.toDataURL(outputType, quality);
+                  resolve({ dataUrl, mimeType: outputType });
+              };
+              img.onerror = reject;
+              img.src = e.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+      });
+  }
+
+  function extractBase64(dataUrl) {
+      return dataUrl.split(',')[1];
+  }
+
+  window.togglePreview = function(previewId, cardElement) {
+    const box = document.getElementById(previewId);
+    const icon = cardElement.querySelector('.preview-chevron');
+    if (box.style.maxHeight) { box.style.maxHeight = null; box.classList.remove('open'); if(icon) icon.style.transform = 'rotate(0deg)'; }
+    else { box.style.maxHeight = box.scrollHeight + "px"; box.classList.add('open'); if(icon) icon.style.transform = 'rotate(180deg)'; }
+  }
+
+  function getDraftKeyByType(type) {
+    if (type === 'lodging') return 'lodging';
+    if (type === 'meal') return 'meal';
+    if (type === 'other') return 'other';
+    return '';
+  }
+
+  function getListIdByDraftKey(draftKey) {
+    if (draftKey === 'lodging') return 'lodgingFileList';
+    if (draftKey === 'meal') return 'mealFileList';
+    if (draftKey === 'other') return 'otherFileList';
+    return '';
+  }
+
+  /* [수정 ⑫] 금액 입력칸: 0원 대신 빈칸 + 1원 이상만 허용, 올바르게 입력하면 강조 해제 */
+  function bindReceiptAmountInput(amountInput, onValue) {
+    amountInput.addEventListener('click', ev => ev.stopPropagation());
+    amountInput.addEventListener('input', () => {
+      const value = parseInt(amountInput.value, 10) || 0;
+      onValue(value);
+      if (value > 0) amountInput.classList.remove('attention-required');
+    });
+  }
+
+  function renderReceiptList(draftKey) {
+    const listId = getListIdByDraftKey(draftKey);
+    const listEl = document.getElementById(listId);
+    if (!listEl) return;
+
+    const categoryMap = { lodging: '숙박', meal: '식비', other: '기타' };
+    const category = categoryMap[draftKey];
+    const savedEntries = Object.entries(APP_DATA.files).filter(([_, file]) => file.category === category);
+    const draftEntries = APP_DATA.drafts[draftKey] || [];
+
+    listEl.innerHTML = '';
+
+    savedEntries.forEach(([id, file]) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'receipt-wrapper';
+      const previewId = 'preview-saved-' + String(id).replace(/[^a-zA-Z0-9_-]/g, '');
+      const isImage = file.mimeType && file.mimeType.startsWith('image/');
+      const previewSource = file.previewSrc || file.previewUrl || file.fileUrl || '';
+      const previewHtml = isImage && previewSource
+        ? `<img src="${previewSource}" class="receipt-preview-img" alt="영수증 미리보기">`
+        : `<div style="padding:24px 12px; color:#94A3B8; font-size:0.9rem;">제출 전 임시 저장된 영수증입니다.</div>`;
+
+      wrapper.innerHTML = `
+        <div class="receipt-card" onclick="window.togglePreview('${previewId}', this)">
+          <div class="receipt-info">
+            <div class="receipt-icon">${ICONS.file}</div>
+            <div style="overflow:hidden; display:flex; flex-direction:column; justify-content:center;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="receipt-badge">${file.subCategory || category}</span>
+                <span class="receipt-name" style="flex:1;">${file.name}</span>
+              </div>
+              <div style="font-size:0.75rem; color:#10B981; margin-top:2px; display:flex; align-items:center; gap:4px;">제출 대기 · 터치하여 미리보기 <svg class="icon-svg preview-chevron" viewBox="0 0 24 24" style="width:14px; height:14px; transition:0.3s;"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+            </div>
+          </div>
+          <input type="number" class="receipt-amount" placeholder="금액(원)" inputmode="numeric" min="1" value="${file.amount > 0 ? file.amount : ''}" style="width:100px; font-size:0.9rem; padding:8px; border:1px solid #E0E6ED; border-radius:8px; text-align:right; font-weight:700; color:var(--primary);">
+          <span class="receipt-del" onclick="event.stopPropagation(); window.removeFile('${id}', this, '${category}')">${ICONS.trash}</span>
+        </div>
+        <div id="${previewId}" class="receipt-preview-box">${previewHtml}</div>`;
+
+      bindReceiptAmountInput(wrapper.querySelector('.receipt-amount'), value => {
+        APP_DATA.files[id].amount = value;
+        updateTotal();
+      });
+
+      listEl.appendChild(wrapper);
+    });
+
+    draftEntries.forEach(item => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'receipt-wrapper';
+      const previewId = 'preview-' + item.draftId;
+      const previewHtml = item.previewUrl
+        ? `<img src="${item.previewUrl}" class="receipt-preview-img" alt="영수증 미리보기">`
+        : `<div style="padding:24px 12px; color:#94A3B8; font-size:0.9rem;">미리보기를 지원하지 않는 파일입니다.</div>`;
+
+      wrapper.innerHTML = `
+        <div class="receipt-card" onclick="window.togglePreview('${previewId}', this)">
+          <div class="receipt-info">
+            <div class="receipt-icon">${ICONS.file}</div>
+            <div style="overflow:hidden; display:flex; flex-direction:column; justify-content:center;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="receipt-badge">${item.subCategory}</span>
+                <span class="receipt-name" style="flex:1;">${item.name}</span>
+              </div>
+              <div style="font-size:0.75rem; color:#F59E0B; margin-top:2px; display:flex; align-items:center; gap:4px;">임시 저장 전 · 터치하여 미리보기 <svg class="icon-svg preview-chevron" viewBox="0 0 24 24" style="width:14px; height:14px; transition:0.3s;"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+            </div>
+          </div>
+          <input type="number" class="receipt-amount" placeholder="금액(원)" inputmode="numeric" min="1" value="${item.amount > 0 ? item.amount : ''}" style="width:100px; font-size:0.9rem; padding:8px; border:1px solid #E0E6ED; border-radius:8px; text-align:right; font-weight:700; color:var(--primary);">
+          <span class="receipt-del" onclick="event.stopPropagation(); window.removeDraftFile('${draftKey}', '${item.draftId}', this)">${ICONS.trash}</span>
+        </div>
+        <div id="${previewId}" class="receipt-preview-box">${previewHtml}</div>`;
+
+      bindReceiptAmountInput(wrapper.querySelector('.receipt-amount'), value => {
+        const target = APP_DATA.drafts[draftKey].find(d => d.draftId === item.draftId);
+        if (target) target.amount = value;
+      });
+
+      listEl.appendChild(wrapper);
+    });
+  }
+
+  window.openModal = function(type) {
+    const draftKey = getDraftKeyByType(type);
+    if (draftKey) renderReceiptList(draftKey);
+    document.getElementById('modal' + type.charAt(0).toUpperCase() + type.slice(1)).style.display = 'flex';
+    updateTotal();
+  }
+
+  /* [수정 ⑧] X·바깥 영역·Esc로 닫아도 첨부한 영수증이 사라지지 않도록 임시 영수증을 자동 저장한다.
+     (금액 미입력 영수증은 저장은 하되, 제출 단계에서 막는다) */
+  window.closeModal = async function(type) {
+    const draftKey = getDraftKeyByType(type);
+    if (draftKey && APP_DATA.drafts[draftKey].length) {
+      const ok = await saveDraftFiles(draftKey);
+      if (ok) toast('첨부한 영수증을 임시 저장했습니다.', 'info');
+    }
+    document.getElementById('modal' + type.charAt(0).toUpperCase() + type.slice(1)).style.display = 'none';
+    updateTotal();
+  }
+
+  function getTravelType() {
+    const el = document.getElementById('travelType');
+    return el ? el.value : 'domestic';
+  }
+
+  function showOverseasGuide() {
+    const guideModal = document.getElementById('modalOverseasGuide');
+    if (guideModal) guideModal.style.display = 'flex';
+  }
+
+  function updateTravelModeUI(showGuide) {
+    const isOverseas = getTravelType() === 'overseas';
+    const isPrivate = isPrivateTransport();
+    const transportType = getSelectedTransportType();
+    const routeTitle = document.getElementById('routeTitleText');
+    const mainBtn = document.getElementById('mainStepBtn');
+    const transportExtraRow = document.getElementById('transportExtraRow');
+
+    if (transportExtraRow) {
+      transportExtraRow.classList.toggle('hidden', !isPrivate);
+    }
+
+    if (routeTitle) {
+      routeTitle.innerHTML = isOverseas
+        ? `<svg class="icon-svg" viewBox="0 0 24 24" style="color:#10B981; margin-right:6px;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>공항 이동 경로`
+        : `<svg class="icon-svg" viewBox="0 0 24 24" style="color:#10B981; margin-right:6px;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>출장 경로`;
+    }
+
+    document.querySelectorAll('.dynamic-row .route-label').forEach(label => {
+      label.innerText = isOverseas ? '공항' : '방문';
+    });
+    document.querySelectorAll('.dynamic-row .dest').forEach(input => {
+      input.placeholder = isOverseas ? '🔍 인천공항 또는 김포공항 검색' : '🔍 터치하여 장소 검색';
+    });
+
+    /* [수정 ②] 이동수단과 무관하게 거리 계산 단계를 거친다 */
+    if (mainBtn && !transportType) {
+      mainBtn.innerHTML = '이동수단 선택 후 계속하기';
+      mainBtn.classList.remove('ready-to-go');
+    } else if (mainBtn && !APP_DATA.isDistanceCalculated) {
+      mainBtn.innerHTML = isOverseas ? '🚗 공항 이동거리 계산하기' : '🚗 운행 거리 계산하기';
+      mainBtn.classList.remove('ready-to-go');
+    } else if (mainBtn && APP_DATA.isDistanceCalculated) {
+      mainBtn.innerHTML = isOverseas ? '✅ 일비·실비 정산하러 가기' : '✅ 정산하러 가기';
+      mainBtn.classList.add('ready-to-go');
+    }
+
+    if (isPrivate && isOverseas && showGuide) {
+      APP_DATA.overseasGuideShown = true;
+      showOverseasGuide();
+    }
+  }
+
+  window.toggleOverseasTrip = function(checked) {
+    const typeInput = document.getElementById('travelType');
+    if (typeInput) typeInput.value = checked ? 'overseas' : 'domestic';
+    resetCalculationState();
+    updateTravelModeUI(checked);
+    updateInputGuide();
+  };
+
+  window.selectTransport = function(value, btn) {
+    document.getElementById('transportationType').value = value;
+    document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const infoBox = document.getElementById('transportationInfo');
+    const overseasTripCheck = document.getElementById('overseasTripCheck');
+    const travelType = document.getElementById('travelType');
+    let text = '';
+    if(value === 'private') text = "교통비(유류비)가 거리 기반으로 계산됩니다.";
+    else if(value === 'public_transport') text = "관내 여부 확인을 위해 거리를 계산합니다. 요금은 '기타 실비'에서 청구해주세요.";
+    else if(value === 'company_car') text = "관내 여부 확인을 위해 거리를 계산합니다. 일비의 50%가 감액됩니다.";
+    else if(value === 'companion') text = "관내 여부 확인을 위해 거리를 계산합니다. 일비의 50%가 감액되며 교통비는 지급되지 않습니다.";
+    infoBox.innerText = text;
+    if (value !== 'private') {
+      if (overseasTripCheck) overseasTripCheck.checked = false;
+      if (travelType) travelType.value = 'domestic';
+    }
+    resetCalculationState();
+    updateTravelModeUI(false);
+    updateSummaryBadges();
+    updateInputGuide();
+  };
+
+  /* [수정 ⑨] 파일 선택창을 열기 전에 첨부 한도를 먼저 확인한다 */
+  window.handleFileBoxClick = function(typeSelectId, fileInputId, category) {
+    if (category) {
+      const limit = getReceiptLimit(category);
+      if (Number.isFinite(limit) && getCategoryCount(category) >= limit) {
+        toast(getReceiptLimitMessage(category, limit));
+        return;
+      }
+    }
+    const typeSelect = typeSelectId ? document.getElementById(typeSelectId) : null;
+    if (typeSelect && (!typeSelect.value || typeSelect.value === '0')) {
+      typeSelect.classList.add('attention-required');
+      toast('항목(지역)을 먼저 선택해주세요.');
+      typeSelect.focus();
+      return;
+    }
+    document.getElementById(fileInputId).click();
+  };
+
+  function setupFileHandler(inputId, listId, category, draftKey) {
+    const inputEl = document.getElementById(inputId);
+    if (!inputEl) return;
+
+    inputEl.addEventListener('change', async e => {
+      const files = Array.from(e.target.files);
+
+      /* [수정 ⑦·⑨] 식비는 조건 충족일 수, 숙박은 숙박 일수만큼만 첨부 */
+      const limit = getReceiptLimit(category);
+      if (Number.isFinite(limit) && files.length > limit - getCategoryCount(category)) {
+        toast(getReceiptLimitMessage(category, limit));
+        e.target.value = '';
+        return;
+      }
+
+      let subLabel = category;
+      if (category === '숙박') {
+        const sel = document.getElementById('lodgingType');
+        if (sel && sel.selectedIndex > 0) subLabel = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+      } else if (category === '기타') {
+        const sel = document.getElementById('otherType');
+        if (sel && sel.selectedIndex > 0) subLabel = sel.options[sel.selectedIndex].text;
+      } else if (category === '식비') {
+        subLabel = '식비';
+      }
+
+      for (const file of files) {
+        const draftId = 'draft_' + Date.now() + '_' + Math.random().toString(16).slice(2);
+        const previewUrl = file.type && file.type.startsWith('image/') ? URL.createObjectURL(file) : '';
+
+        const draftItem = {
+          draftId,
+          file,
+          name: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          category,
+          subCategory: subLabel,
+          amount: 0,
+          previewUrl
+        };
+
+        APP_DATA.drafts[draftKey].push(draftItem);
+      }
+
+      renderReceiptList(draftKey);
+      e.target.value = '';
+    });
+  }
+
+  window.removeDraftFile = function(draftKey, draftId, elem) {
+    if (!confirm("정말 이 영수증을 삭제하시겠습니까?")) return;
+
+    const idx = APP_DATA.drafts[draftKey].findIndex(d => d.draftId === draftId);
+    if (idx > -1) {
+      const item = APP_DATA.drafts[draftKey][idx];
+      if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+      APP_DATA.drafts[draftKey].splice(idx, 1);
+    }
+
+    renderReceiptList(draftKey);
+  };
+
+  async function saveDraftFiles(draftKey) {
+    const drafts = APP_DATA.drafts[draftKey];
+    if (!drafts.length) return true;
+
+    try {
+      for (const item of drafts) {
+        const id = `local_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+        APP_DATA.files[id] = {
+          file: item.file,
+          name: item.name,
+          mimeType: item.mimeType || 'application/octet-stream',
+          category: item.category,
+          subCategory: item.subCategory,
+          amount: item.amount || 0,
+          previewUrl: item.previewUrl || '',
+          previewSrc: item.previewUrl || ''
+        };
+      }
+
+      APP_DATA.drafts[draftKey] = [];
+      renderReceiptList(draftKey);
+      updateTotal();
+      return true;
+    } catch (err) {
+      toast('저장 실패: ' + (err && err.message ? err.message : err));
+      console.error(err);
+      return false;
+    }
+  }
+
+  /* [수정 ⑫] 모달 안의 영수증 금액이 모두 1원 이상인지 확인하고, 아니면 해당 칸을 강조한다 */
+  function validateReceiptAmountsInModal(draftKey) {
+    const listEl = document.getElementById(getListIdByDraftKey(draftKey));
+    if (!listEl) return true;
+    const invalidInputs = Array.from(listEl.querySelectorAll('.receipt-amount'))
+      .filter(input => !isValidReceiptAmount(input.value));
+    if (!invalidInputs.length) return true;
+
+    invalidInputs.forEach(input => input.classList.add('attention-required'));
+    invalidInputs[0].focus();
+    toast('영수증 금액을 1원 이상 입력해주세요.');
+    return false;
+  }
+
+  window.saveAndCloseModal = async function(type) {
+    const draftKey = getDraftKeyByType(type);
+    if (!draftKey) return;
+    if (!validateReceiptAmountsInModal(draftKey)) return;
+    const ok = await saveDraftFiles(draftKey);
+    if (!ok) return;
+    closeModal(type);
+  }
+
+  // [수정] removeFile Logic Update (Fix deletion issue)
+  window.removeFile = function(id, elem, category) {
+    if(!confirm("정말 이 영수증을 삭제하시겠습니까?")) return;
+    revokePreviewUrl(APP_DATA.files[id]);
+    delete APP_DATA.files[id];
+    updateTotal();
+    const draftKey = CATEGORY_DRAFT_KEY[category] || 'other';
+    renderReceiptList(draftKey);
+  };
+
+  /* --- Timeline Logic --- */
+  function initSegmentList() {
+    const container = document.getElementById('timelineContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    renderStaticRow('start', '출발', PRIMARY_LOCATION);
+    renderVisitRow('');
+    renderStaticRow('return', '복귀', PRIMARY_LOCATION);
+    updateRowButtons();
+  }
+
+  function renderStaticRow(type, label, text) {
+    const container = document.getElementById('timelineContainer');
+    const div = document.createElement('div'); div.className = 'traffic-row';
+    let markerClass = type === 'start' ? 'start' : 'end';
+    div.innerHTML = `
+      <div class="timeline-col"><div class="timeline-marker ${markerClass}"></div><div class="timeline-line"></div></div>
+      <div class="content-col">
+          <span class="route-label" style="color:var(--primary)">${label}</span>
+          <input type="text" value="${text}" readonly class="static-input">
+      </div>`;
+    container.appendChild(div);
+  }
+
+  function renderVisitRow(value='') {
+    const container = document.getElementById('timelineContainer');
+    const returnRow = container.lastElementChild;
+    const div = document.createElement('div');
+    div.className = 'traffic-row dynamic-row';
+    div.innerHTML = `
+      <div class="timeline-col"><div class="timeline-marker visit"></div><div class="timeline-line"></div></div>
+      <div class="content-col">
+          <span class="route-label">${getTravelType() === 'overseas' ? '공항' : '방문'}</span>
+          <input type="text" class="dest" placeholder="${getTravelType() === 'overseas' ? '🔍 인천공항 또는 김포공항 검색' : '🔍 터치하여 장소 검색'}" value="${value}" readonly>
+          <!-- Hidden Coordinates / Address -->
+          <input type="hidden" class="dest-x">
+          <input type="hidden" class="dest-y">
+          <input type="hidden" class="dest-addr">
+          <div class="side-btn-container"></div>
+      </div>`;
+    if (returnRow && returnRow.querySelector('.route-label').innerText === '복귀') { container.insertBefore(div, returnRow); } else { container.appendChild(div); }
+    const destInput = div.querySelector('.dest');
+    destInput.addEventListener('click', () => openSearch(destInput));
+    destInput.style.cursor='pointer';
+    updateRowButtons();
+  }
+
+  function updateRowButtons() {
+      const dynamicRows = document.querySelectorAll('.dynamic-row');
+      const total = dynamicRows.length;
+      dynamicRows.forEach((row, index) => {
+          const btnContainer = row.querySelector('.side-btn-container');
+          btnContainer.innerHTML = '';
+          const btn = document.createElement('div');
+          if (index === total - 1) {
+              btn.className = 'side-btn add';
+              btn.innerHTML = `<svg class="icon-svg" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+              btn.onclick = () => { renderVisitRow(''); resetCalculationState(); };
+          } else {
+              btn.className = 'side-btn del';
+              btn.innerHTML = `<svg class="icon-svg" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+              btn.onclick = () => { row.remove(); updateRowButtons(); resetCalculationState(); };
+          }
+          btnContainer.appendChild(btn);
+      });
+  }
+
+  function openSearch(inputElem) {
+    APP_DATA.currentFocusSearchInput = inputElem;
+    document.getElementById('searchModal').style.display = 'flex';
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchResultList').innerHTML = '<div style="text-align:center; color:#94A3B8; padding:40px 0; font-size:0.9rem;">검색어를 입력하고<br>돋보기를 눌러주세요.</div>';
+    document.getElementById('searchInput').focus();
+  }
+
+  function handleSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    /* [수정 ⑪] 서버와 동일하게 2글자 이상만 검색 */
+    if (query.length < 2) return toast('검색어를 2글자 이상 입력하세요.');
+    const listArea = document.getElementById('searchResultList');
+    listArea.innerHTML = '<div style="text-align:center; padding:20px; display:flex; flex-direction:column; align-items:center; gap:10px;"><span class="spinner-sm" style="border-color:#4169E1; border-top-color:transparent;"></span><span style="font-size:0.85rem; color:#94A3B8;">장소를 검색하고 있어요...</span></div>';
+
+    // Real Server Call
+    callServer('searchPlaces', query).then(results => {
+       listArea.innerHTML = '';
+       if(!results || results.length === 0) {
+           listArea.innerHTML = '<div style="text-align:center; padding:20px; color:#94A3B8;">검색 결과가 없습니다.</div>';
+           return;
+       }
+       results.forEach(place => {
+           const displayAddress = place.road_address_name || place.address_name || '';
+           const div = document.createElement('div');
+           div.className = 'search-result-item';
+           div.innerHTML = `<div class="place-name"><span class="place-badge">장소</span>${place.place_name}</div><div class="place-address">${displayAddress}</div>`;
+           div.onclick = () => {
+               const target = APP_DATA.currentFocusSearchInput;
+               target.value = place.place_name;
+               const parent = target.parentElement;
+               parent.querySelector('.dest-x').value = place.x;
+               parent.querySelector('.dest-y').value = place.y;
+               /* [수정 ⑩] 도로명·지번 주소를 함께 저장해 관내 판별에 사용 */
+               parent.querySelector('.dest-addr').value =
+                 [place.road_address_name, place.address_name].filter(Boolean).join(' / ');
+
+               target.closest('.form-group')?.classList.add('has-value');
+               document.getElementById('searchModal').style.display = 'none';
+               resetCalculationState();
+               updateInputGuide();
+           };
+           listArea.appendChild(div);
+       });
+    }).catch(e => {
+        listArea.innerHTML = `<div style="text-align:center; padding:20px; color:#EF4444;">오류: ${e.message}</div>`;
+    });
+  }
+
+  /* [수정 ②] 이동수단과 무관하게 항상 거리 계산이 필요하다 */
+  function resetCalculationState() {
+      APP_DATA.isDistanceCalculated = false;
+      APP_DATA.totalKm = 0;
+      document.getElementById('routeDistanceBox').classList.add('hidden');
+      updateSummaryBadges();
+
+      const btn = document.getElementById('mainStepBtn');
+      if (!btn) return;
+      if (!getSelectedTransportType()) {
+        btn.innerHTML = '이동수단 선택 후 계속하기';
+        btn.classList.remove('ready-to-go');
+        return;
+      }
+      btn.innerHTML = getTravelType() === 'overseas' ? '🚗 공항 이동거리 계산하기' : '🚗 운행 거리 계산하기';
+      btn.classList.remove('ready-to-go');
+  }
+
+  async function handleMainBtnClick() {
+      if(!document.getElementById('applicantName').value) return toast('청구인 성명을 입력해주세요.');
+      if(!validateTravelWindow()) return;
+      if(!document.getElementById('transportationType').value) return toast('이동 수단을 선택해주세요.');
+      if (!getRouteStops().length) return toast('출장지를 1곳 이상 입력해주세요.');
+
+      if (!APP_DATA.isDistanceCalculated) calculateDistance();
+      else {
+          goToStep2();
+          updateInputGuide();
+      }
+  }
+
+  function calculateDistance() {
+    if(!document.getElementById('applicantName').value) return toast('청구인 성명을 입력해주세요.');
+    if(!validateTravelWindow()) return;
+    if(!document.getElementById('transportationType').value) return toast('이동 수단을 선택해주세요.');
+
+    const destInputs = document.querySelectorAll('.dynamic-row .dest');
+    for(let input of destInputs) { if(!input.value) return toast('모든 경로의 목적지를 설정해주세요.'); }
+
+    /* [수정 ⑩] 주소 기준 관내 판별 */
+    if (getTravelType() !== 'overseas') {
+      const isRestricted = getRouteStopDetails().some(stop => isRestrictedPlace(stop.name, stop.address));
+      if (isRestricted) return toast('군포, 의왕, 안양, 과천 지역은 관내 출장으로 처리해야 합니다.');
+    }
+
+    showLoading(true, "계산 중 ");
+    const segments = buildSegmentsPayload();
+
+    callServer('calculateDistanceOnServer', segments)
+      .then(res => {
+        showLoading(false);
+        if(res.error) { return toast('거리 계산 실패: ' + res.error); }
+        APP_DATA.totalKm = res.totalKm;
+        if (APP_DATA.totalKm < 12) {
+          APP_DATA.totalKm = 0;
+          updateSummaryBadges();
+          return toast('왕복 12km 미만은 관내 출장으로 처리해야 합니다.');
+        }
+
+        const distBox = document.getElementById('routeDistanceBox');
+        const distMsg = document.getElementById('routeDistanceMsg');
+        const btn = document.getElementById('mainStepBtn');
+
+        distBox.classList.remove('hidden');
+        distMsg.innerHTML = `🏁 총 운행 거리: ${APP_DATA.totalKm}km`;
+        btn.innerHTML = getTravelType() === 'overseas' ? `✅ 일비·실비 정산하러 가기` : `✅ 정산하러 가기`;
+        btn.classList.add('ready-to-go');
+        APP_DATA.isDistanceCalculated = true;
+        updateSummaryBadges();
+      })
+      .catch(e => {
+          showLoading(false);
+          toast('서버 통신 오류: ' + e.message);
+      });
+  }
+
+  /* [수정 ⑮] 모달이 실제로 열려 있을 때만 Esc로 닫는다
+     (기존: 검색 모달을 한 번도 열지 않으면 style.display가 ''라서 다른 모달이 Esc로 닫히지 않았음) */
+  function isModalOpen(el) {
+    return !!el && el.style.display === 'flex';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initDatePickers(); initTimeSelects();
+    initSegmentList();
+    updateTravelModeUI(false);
+    setupEventListeners();
+    updateInputGuide();
+    document.querySelectorAll('.modal-overlay').forEach(modal => { modal.addEventListener('click', (e) => { if (e.target === modal) { if (['modalLodging', 'modalMeal', 'modalOther', 'modalConfirm'].includes(modal.id)) closeModal(modal.id.replace('modal','').toLowerCase()); else modal.style.display = 'none'; } }); });
+    window.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const searchModal = document.getElementById('searchModal');
+      if (isModalOpen(searchModal)) { searchModal.style.display = 'none'; return; }
+      ['modalLodging', 'modalMeal', 'modalOther'].forEach(id => {
+        const m = document.getElementById(id);
+        if (isModalOpen(m)) closeModal(id.replace('modal','').toLowerCase());
+      });
+    });
+  });
+
+  function initDatePickers() {
+    const locale = { days: ['일','월','화','수','목','금','토'], daysShort: ['일','월','화','수','목','금','토'], daysMin: ['일','월','화','수','목','금','토'], months: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'], monthsShort: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'], today: '오늘', clear: '취소', dateFormat: 'yyyy-MM-dd', firstDay: 0 };
+    new AirDatepicker('#startDate', { locale, autoClose: true }); new AirDatepicker('#endDate', { locale, autoClose: true });
+  }
+  function initTimeSelects() {
+    const hSelects = [document.getElementById('startHour'), document.getElementById('endHour')], mSelects = [document.getElementById('startMin'), document.getElementById('endMin')];
+    /* [수정 ⑬] 새벽 출발·심야 복귀도 입력할 수 있도록 0~23시 전체 제공 */
+    const hours = []; for(let i=0; i<=23; i++) hours.push(String(i).padStart(2,'0'));
+    const mins = ['00','10','20','30','40','50'];
+    hSelects.forEach(sel => hours.forEach(h => { const opt = document.createElement('option'); opt.value = h; opt.innerText = h + '시'; sel.appendChild(opt); }));
+    mSelects.forEach(sel => mins.forEach(m => { const opt = document.createElement('option'); opt.value = m; opt.innerText = m + '분'; sel.appendChild(opt); }));
+    document.getElementById('startHour').value = '09'; document.getElementById('startMin').value = '00'; document.getElementById('endHour').value = '17'; document.getElementById('endMin').value = '00';
+  }
+
+  /* [수정 ⑫] 제출을 막는 조건을 한 곳에서 확인 (확인 모달을 띄우기 전 + 실제 제출 직전) */
+  function getSubmitBlocker() {
+    if (!document.getElementById('applicantName').value) return '청구인 성명을 입력해주세요.';
+    if (!validateTravelWindow(false)) return '출장 일시를 다시 확인해주세요.';
+    if (!document.getElementById('transportationType').value) return '이동 수단을 선택해주세요.';
+    if (!APP_DATA.isDistanceCalculated) return '거리 계산을 먼저 완료해주세요.';
+    if (!getRouteStops().length) return '최소 1개의 목적지를 입력해주세요.';
+    if (APP_DATA.mealEligibleDays === 0 && getCategoryCount('식비') > 0) {
+      return '현재 출장 시간 조건으로는 식비를 청구할 수 없습니다.';
+    }
+    if (getCategoryCount('숙박') > APP_DATA.nights) {
+      return getReceiptLimitMessage('숙박', APP_DATA.nights);
+    }
+    const zeroReceipt = Object.values(APP_DATA.files).find(f => !isValidReceiptAmount(f.amount));
+    if (zeroReceipt) {
+      return `금액이 입력되지 않은 영수증이 있습니다 (${zeroReceipt.category} · ${zeroReceipt.name}).`;
+    }
+    return '';
+  }
+
+  /* [수정 ①] 화면 아무 곳이나 누르면 선택이 초기화되던 전역 클릭 리스너를 제거함 */
+  function setupEventListeners() {
+    document.getElementById('backToStep1Btn').addEventListener('click', () => { document.getElementById('step2Container').classList.add('hidden'); document.getElementById('step1Container').classList.remove('hidden'); document.getElementById('dot2').classList.remove('active'); document.getElementById('dot1').classList.add('active'); });
+    document.getElementById('finalSubmitBtn').addEventListener('click', () => {
+      const blocker = getSubmitBlocker();
+      if (blocker) return toast(blocker);
+      document.getElementById('modalConfirm').style.display = 'flex';
+    });
+    document.querySelectorAll('input, select').forEach(el => { el.addEventListener('change', function() { if(this.value) this.classList.add('has-value'); else this.classList.remove('has-value'); updateInputGuide(); }); el.addEventListener('focus', function() { this.classList.remove('breathing-input'); }); });
+    document.getElementById('lodgingType').addEventListener('change', () => updateInputGuide()); document.getElementById('otherType').addEventListener('change', () => updateInputGuide());
+    setupFileHandler('lodgingFile', 'lodgingFileList', '숙박', 'lodging'); setupFileHandler('mealFile', 'mealFileList', '식비', 'meal'); setupFileHandler('otherFile', 'otherFileList', '기타', 'other');
+    document.getElementById('doSearchBtn').addEventListener('click', handleSearch);
+    document.getElementById('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearch(); } });
+
+    // 출장 일시가 바뀌면 거리 계산 결과는 유지하되 식비 조건은 다시 판정한다
+    ['startDate','endDate','startHour','startMin','endHour','endMin'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', () => {
+        const w = validateTravelWindow(false);
+        APP_DATA.mealEligibleDays = w ? getMealEligibleDays(w.start, w.end) : 0;
+      });
+    });
+  }
+
+  function updateInputGuide() {
+      if (!document.getElementById('step1Container').classList.contains('hidden')) {
+          const nameInput = document.getElementById('applicantName');
+          if(!nameInput.value) nameInput.classList.add('breathing-input');
+          else nameInput.classList.remove('breathing-input');
+      }
+  }
+
+  function initDashboard() {
+    const windowInfo = validateTravelWindow(false);
+    if (!windowInfo) return;
+
+    const { start, end } = windowInfo;
+    const sDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const eDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    APP_DATA.nights = Math.round((eDay - sDay) / (1000 * 60 * 60 * 24));
+    APP_DATA.tripDays = APP_DATA.nights + 1;
+
+    const transportType = document.getElementById('transportationType').value;
+
+    /* [수정 ③] 공용차량·차량동승 모두 일비 1/2 감액 */
+    let allowancePerDay = 25000;
+    if (transportType === 'company_car' || transportType === 'companion') {
+      allowancePerDay = 12500;
+    }
+
+    APP_DATA.dailyAllowance = APP_DATA.tripDays * allowancePerDay;
+    document.getElementById('dashAllowanceAmount').innerText =
+      APP_DATA.dailyAllowance.toLocaleString() + '원';
+    document.getElementById('dashAllowanceDetail').innerText =
+      `${APP_DATA.tripDays}일 x ${allowancePerDay.toLocaleString()}원`;
+
+    /* [수정 ④] 규정 제3조④2 - 왕복 40km 초과일 때만 유류비 지급 */
+    const KMRATE = 160;
+    if (transportType === 'private' && APP_DATA.totalKm > 40) {
+      const rawCost = APP_DATA.totalKm * KMRATE;
+      APP_DATA.trafficCost = Math.floor(rawCost / 10) * 10;
+      document.getElementById('dashTrafficDetail').innerText =
+        `${APP_DATA.totalKm}km x ${KMRATE}원`;
+    } else {
+      APP_DATA.trafficCost = 0;
+      if (transportType === 'private') {
+        document.getElementById('dashTrafficDetail').innerText =
+          `총 ${APP_DATA.totalKm}km (40km 이하 지급 제외)`;
+      } else if (transportType === 'public_transport') {
+        document.getElementById('dashTrafficDetail').innerText =
+          `총 ${APP_DATA.totalKm}km · 대중교통 (기타 실비에 입력)`;
+      } else if (transportType === 'company_car') {
+        document.getElementById('dashTrafficDetail').innerText =
+          `총 ${APP_DATA.totalKm}km · 공용 차량 이용`;
+      } else if (transportType === 'companion') {
+        document.getElementById('dashTrafficDetail').innerText =
+          `총 ${APP_DATA.totalKm}km · 차량동승 (교통비 없음)`;
+      } else {
+        document.getElementById('dashTrafficDetail').innerText = '정보 없음';
+      }
+    }
+    document.getElementById('dashTrafficAmount').innerText =
+      APP_DATA.trafficCost.toLocaleString() + '원';
+
+    /* [수정 ⑨] 숙박비는 숙박 일수(박)만큼만 인정. 당일 출장은 숙박비 버튼을 숨긴다 */
+    trimCategoryEntries('숙박', APP_DATA.nights);
+    const lodgingMsg = document.getElementById('lodgingEligibleMsg');
+    const lodgingBtn = document.getElementById('btnAddLodging');
+    if (APP_DATA.nights > 0) {
+      lodgingMsg.innerHTML = `숙박비 정산 가능 · 최대 ${APP_DATA.nights}박`;
+      lodgingMsg.style.color = '#00B894';
+      lodgingBtn.style.display = 'flex';
+    } else {
+      lodgingMsg.innerHTML = '당일 출장은 숙박비를 청구할 수 없습니다.';
+      lodgingMsg.style.color = '#EF4444';
+      lodgingBtn.style.display = 'none';
+    }
+
+    /* [수정 ⑦] 다일 출장은 조건을 충족하는 날 수만큼 식비 인정 */
+    const eligibleDays = getMealEligibleDays(start, end);
+    APP_DATA.mealEligibleDays = eligibleDays;
+    trimCategoryEntries('식비', eligibleDays);
+
+    const mealMsg = document.getElementById('mealEligibleMsg');
+    const mealBtn = document.getElementById('btnAddMeal');
+
+    if (eligibleDays > 0) {
+      mealMsg.innerHTML = `식비 정산 가능 · 최대 ${eligibleDays}일분 (1일 8,330원)`;
+      mealMsg.style.color = '#00B894';
+      mealBtn.style.display = 'flex';
+    } else {
+      mealMsg.innerHTML = '조건 미충족 (시작 10시 이전 · 점심시간 포함 · 3시간 이상)';
+      mealMsg.style.color = '#EF4444';
+      mealBtn.style.display = 'none';
+    }
+
+    updateSummaryBadges();
+    updateTotal();
+  }
+
+  /* [수정 ⑫] 대시보드 요약에 금액 미입력 영수증 표시 */
+  function buildReceiptSummaryLines(files, getCap, capLabel) {
+    return files.map((file, index) => {
+      const amount = parseInt(file.amount, 10) || 0;
+      const cap = getCap(file);
+      let note = '';
+      if (amount <= 0) note = `<span style="color:#EF4444; font-size:0.8rem;"> (금액 미입력)</span>`;
+      else if (amount > cap) note = `<span style="color:#EF4444; font-size:0.8rem;"> (${capLabel} ${cap.toLocaleString()}원 적용)</span>`;
+      return `
+          <div style="margin-top:2px; line-height:1.45;">
+              <span style="color:#64748B;">영수증 ${index + 1}:</span>
+              <strong style="color:var(--text-title);">${amount.toLocaleString()}원</strong>
+              ${note}
+          </div>
+      `;
+    }).join('');
+  }
+
+  // [수정] updateTotal Logic Update
+  function updateTotal() {
+    let total = APP_DATA.dailyAllowance + APP_DATA.trafficCost;
+
+    // 1. Lodging
+    const lodgingFiles = Object.values(APP_DATA.files).filter(f => f.category === '숙박');
+    const lodgingCount = lodgingFiles.length;
+    const lodgingTotal = getCategoryTotal('숙박', true);
+    const lodgingCard = document.getElementById('cardLodging');
+    const lodgingBtn = document.getElementById('btnAddLodging');
+
+    if (lodgingCount > 0) {
+        const lodgingCap = file => {
+            const sub = file.subCategory || '';
+            if (sub.includes('서울')) return 100000;
+            if (sub.includes('광역시')) return 80000;
+            return 70000;
+        };
+        document.getElementById('dashLodgingAmount').innerText = lodgingTotal.toLocaleString() + '원';
+        document.getElementById('summaryLodging').innerHTML = buildReceiptSummaryLines(lodgingFiles, lodgingCap, '최대');
+        lodgingCard.classList.remove('hidden');
+        lodgingBtn.classList.add('hidden');
+    } else {
+        lodgingCard.classList.add('hidden');
+        lodgingBtn.classList.remove('hidden');
+    }
+    if(document.getElementById('liveLodgingTotal'))
+        document.getElementById('liveLodgingTotal').innerText = lodgingTotal.toLocaleString() + '원';
+    total += lodgingTotal;
+
+    // 2. Meal
+    const mealFiles = Object.values(APP_DATA.files).filter(f => f.category === '식비');
+    const mealCount = mealFiles.length;
+    const mealAmt = getCategoryTotal('식비', true);
+    const mealCard = document.getElementById('cardMeal');
+    const mealBtn = document.getElementById('btnAddMeal');
+
+    if (mealCount > 0) {
+        document.getElementById('dashMealAmount').innerText = mealAmt.toLocaleString() + '원';
+        document.getElementById('summaryMeal').innerHTML = buildReceiptSummaryLines(mealFiles, () => 8330, '1일 최대');
+        mealCard.classList.remove('hidden');
+        mealBtn.classList.add('hidden');
+    } else {
+        mealCard.classList.add('hidden');
+        mealBtn.classList.remove('hidden');
+    }
+    total += mealAmt;
+
+    // 3. Other
+    const otherFiles = Object.values(APP_DATA.files).filter(f => f.category === '기타');
+    const otherTotal = getCategoryTotal('기타', true);
+    const otherCount = otherFiles.length;
+    const otherMissing = otherFiles.filter(f => !isValidReceiptAmount(f.amount)).length;
+    const otherCard = document.getElementById('cardOther');
+    const otherBtn = document.getElementById('btnAddOther');
+
+    if (otherCount > 0) {
+        document.getElementById('dashOtherAmount').innerText = otherTotal.toLocaleString() + '원';
+        document.getElementById('summaryOther').innerHTML =
+          `영수증 ${otherCount}건: ${otherTotal.toLocaleString()}원` +
+          (otherMissing ? ` <span style="color:#EF4444;">(금액 미입력 ${otherMissing}건)</span>` : '');
+        otherCard.classList.remove('hidden');
+        otherBtn.classList.add('hidden');
+    } else {
+        otherCard.classList.add('hidden');
+        otherBtn.classList.remove('hidden');
+    }
+    if(document.getElementById('liveOtherTotal'))
+        document.getElementById('liveOtherTotal').innerText = otherTotal.toLocaleString() + '원';
+    total += otherTotal;
+
+    document.getElementById('grandTotal').innerText = total.toLocaleString() + '원';
+  }
+
+  function runServerFunction(functionName, payload) {
+      return callServer(functionName, payload);
+  }
+
+  async function uploadReceiptsBeforeSubmit(applicantName) {
+      const uploadedReceipts = [];
+      const files = Object.values(APP_DATA.files);
+
+      try {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const isImage = file.mimeType && file.mimeType.startsWith('image/');
+          let prepared;
+
+          showLoading(true, `영수증 업로드 중 (${i + 1}/${files.length})`);
+
+          if (isImage) {
+            prepared = await compressImageFile(file.file);
+          } else {
+            const dataUrl = await readFileAsDataURL(file.file);
+            prepared = { dataUrl, mimeType: file.mimeType || 'application/octet-stream' };
+          }
+
+          const payload = {
+            applicantName,
+            category: file.category,
+            subCategory: file.subCategory,
+            amount: parseInt(file.amount, 10) || 0,
+            name: file.name,
+            mimeType: prepared.mimeType,
+            base64Data: extractBase64(prepared.dataUrl)
+          };
+
+          const result = await runServerFunction('uploadReceiptToDrive', payload);
+          if (!result || !result.success) {
+            throw new Error(result?.message || '영수증 업로드에 실패했습니다.');
+          }
+
+          uploadedReceipts.push({
+            category: payload.category,
+            subCategory: payload.subCategory,
+            amount: payload.amount,
+            recognizedAmount: result.recognizedAmount,
+            name: result.name,
+            mimeType: result.mimeType,
+            fileId: result.fileId,
+            fileUrl: result.fileUrl
+          });
+        }
+
+        return uploadedReceipts;
+      } catch (error) {
+        await cleanupUploadedReceipts(uploadedReceipts);
+        throw error;
+      }
+  }
+
+  async function cleanupUploadedReceipts(receipts) {
+      const fileIds = (receipts || []).map(receipt => receipt.fileId).filter(Boolean);
+      if (!fileIds.length) return;
+      try {
+        await runServerFunction('cleanupUploadedReceipts', fileIds);
+      } catch (cleanupError) {
+        console.error('Uploaded receipt cleanup failed:', cleanupError);
+      }
+  }
+
+  window.doFinalSubmit = async function() {
+      const blocker = getSubmitBlocker();
+      if (blocker) {
+        document.getElementById('modalConfirm').style.display = 'none';
+        return toast(blocker);
+      }
+
+      document.getElementById('modalConfirm').style.display = 'none';
+      showLoading(true, "제출 중");
+
+      const submitBtn = document.getElementById('finalSubmitBtn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.6';
+      }
+
+      let receiptPayloads = [];
+
+      try {
+        const windowInfo = validateTravelWindow(false);
+        receiptPayloads = await uploadReceiptsBeforeSubmit(document.getElementById('applicantName').value);
+        const formData = {
+          travelType: getTravelType(),
+          applicantName: document.getElementById('applicantName').value,
+          startDate: windowInfo.startDate,
+          startTime: windowInfo.startTime,
+          endDate: windowInfo.endDate,
+          endTime: windowInfo.endTime,
+          transportationType: document.getElementById('transportationType').value,
+          routeStops: getRouteStops(),
+          routeStopDetails: getRouteStopDetails(),
+          routePath: buildRoutePath(),
+          routeSegments: buildSegmentsPayload(),
+          totalCalculatedKm: APP_DATA.totalKm,
+          receipts: receiptPayloads
+        };
+
+        showLoading(true, '신청서 저장 중');
+        const res = await runServerFunction('processForm', formData);
+
+        showLoading(false);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.style.opacity = '1';
+        }
+
+        if (res && res.success) {
+          showSuccessModal();
+        } else {
+          await cleanupUploadedReceipts(receiptPayloads);
+          toast(res?.message || '제출에 실패했습니다.');
+        }
+      } catch (error) {
+          showLoading(false);
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+          }
+          await cleanupUploadedReceipts(receiptPayloads);
+          toast('제출 준비 중 오류가 발생했습니다: ' + (error?.message || error));
+      }
+  }
+</script>
 </body>
 </html>
