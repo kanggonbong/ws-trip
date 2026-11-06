@@ -1138,7 +1138,7 @@
     <!-- [수정 ⑨] 숙박 가능 박수 안내 -->
     <p id="lodgingEligibleMsg" style="font-size:0.9rem; font-weight:600; padding:12px; border-radius:14px; text-align:center; margin:0 0 14px 0; background:#F8FAFC;"></p>
     <div class="modal-live-total"><span>현재 입력 합계</span><span id="liveLodgingTotal" style="font-size:1.2rem; font-weight:800;">0원</span></div>
-    <div class="form-group">
+    <div class="form-group" id="lodgingRegionGroup">
       <select id="lodgingType"><option value="0" hidden></option><option value="70000">그밖의 지역 (7만원)</option><option value="80000">광역시 (8만원)</option><option value="100000">서울 (10만원)</option></select>
       <label>지역 선택 (필수)</label>
     </div>
@@ -1278,6 +1278,7 @@
   /* [교장 숙박비] 청구인 이름이 바뀌면 서버에 교장 여부를 조회해 둔다.
      최종 금액은 제출 시 서버가 다시 계산하므로, 조회가 실패해도 화면 표시만 상한 기준으로 보일 뿐이다. */
   let applicantPolicyRequest = null;
+  const PRINCIPAL_LODGING_LABEL = '숙박(실비)';
   function refreshApplicantPolicy() {
     const name = document.getElementById('applicantName').value.trim();
     APP_DATA.lodgingCapExempt = false;
@@ -2054,6 +2055,8 @@
         return;
       }
     }
+    /* [교장 숙박비] 상한이 없으므로 지역 선택 불필요 */
+    if (category === '숙박' && APP_DATA.lodgingCapExempt) typeSelectId = null;
     const typeSelect = typeSelectId ? document.getElementById(typeSelectId) : null;
     if (typeSelect && (!typeSelect.value || typeSelect.value === '0')) {
       typeSelect.classList.add('attention-required');
@@ -2082,7 +2085,8 @@
       let subLabel = category;
       if (category === '숙박') {
         const sel = document.getElementById('lodgingType');
-        if (sel && sel.selectedIndex > 0) subLabel = sel.options[sel.selectedIndex].text.split('(')[0].trim();
+        if (APP_DATA.lodgingCapExempt) subLabel = PRINCIPAL_LODGING_LABEL;
+        else if (sel && sel.selectedIndex > 0) subLabel = sel.options[sel.selectedIndex].text.split('(')[0].trim();
       } else if (category === '기타') {
         const sel = document.getElementById('otherType');
         if (sel && sel.selectedIndex > 0) subLabel = sel.options[sel.selectedIndex].text;
@@ -2539,11 +2543,17 @@
 
     /* [수정 ⑨] 숙박비는 숙박 일수(박)만큼만 인정. 당일 출장은 숙박비 버튼을 숨긴다 */
     trimCategoryEntries('숙박', APP_DATA.nights);
+    /* [교장 숙박비] 교장은 지역 선택을 숨긴다. 이름이 바뀌어 교장이 아니게 되면 지역 없이 첨부한 영수증은 지역을 다시 선택하도록 제거 */
+    document.getElementById('lodgingRegionGroup').style.display = APP_DATA.lodgingCapExempt ? 'none' : '';
+    if (!APP_DATA.lodgingCapExempt) {
+      removeEntriesWhere('숙박', f => f.subCategory === PRINCIPAL_LODGING_LABEL,
+        '청구인이 바뀌어 지역 없이 첨부한 숙박 영수증을 제거했습니다. 지역을 선택해 다시 첨부해주세요.');
+    }
     const lodgingMsg = document.getElementById('lodgingEligibleMsg');
     const lodgingBtn = document.getElementById('btnAddLodging');
     if (APP_DATA.nights > 0) {
       lodgingMsg.innerHTML = APP_DATA.lodgingCapExempt
-        ? `숙박비 정산 가능 · 최대 ${APP_DATA.nights}박<br><span style="font-size:0.82rem;">교장 선생님은 상한 없이 실비로 정산됩니다.</span>`
+        ? `숙박비 정산 가능 · 최대 ${APP_DATA.nights}박<br><span style="font-size:0.82rem;">교장 선생님은 지역 구분 없이 실비로 정산됩니다.</span>`
         : `숙박비 정산 가능 · 최대 ${APP_DATA.nights}박`;
       lodgingMsg.style.color = '#00B894';
       lodgingBtn.style.display = 'flex';
